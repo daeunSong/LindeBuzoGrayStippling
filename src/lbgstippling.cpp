@@ -7,6 +7,8 @@
 #include <QVector>
 #include <QtMath>
 
+#include <iostream>
+
 namespace Random {
 static std::random_device rd;
 static std::mt19937 gen(rd());
@@ -101,6 +103,7 @@ std::vector<Stipple> LBGStippling::stipple(const QImage &density,
       randomStipples(params.initialPoints, params.initialPointSize);
 
   Status status = {0, 0, 1, 1, params.hysteresis};
+  clock_t begin_time = clock();
 
   while (notFinished(status, params)) {
     status.splits = 0;
@@ -168,5 +171,10 @@ std::vector<Stipple> LBGStippling::stipple(const QImage &density,
 
     ++status.iteration;
   }
+  clock_t end_time = clock();
+  double time = double(end_time - begin_time)/CLOCKS_PER_SEC*1000;
+
+  std::cout << "TIME: " << time << " ms" << std::endl;
+
   return stipples;
 }
