@@ -52,6 +52,17 @@ The following libraries are required:
 * Qt5Svg
 * Qt5PrintSupport
 
+Install Qt5 from source for newer version.
+```sh
+wget https://download.qt.io/official_releases/qt/5.12/5.12.11/qt-opensource-linux-x64-5.12.11.run
+chmod +x qt-opensource-linux-x64-5.12.11.run
+./qt-opensource-linux-x64-5.12.11.run
+```
+Add the Qt5 install path to the `PATH` variable. Replace the `$QT_INSTALL_PATH` to yours: 
+```sh
+export PATH=${QT_INSTALL_PATH}/Qt5.12.11/5.12.11/gcc_64:$PATH
+```
+
 ### Building
 ```bash
 mkdir build
