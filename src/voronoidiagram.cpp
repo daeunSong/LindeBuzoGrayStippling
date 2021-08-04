@@ -10,6 +10,8 @@
 #include "shader/Voronoi.frag.h"
 #include "shader/Voronoi.vert.h"
 
+#define Assert(expression, message) assert(expression && message)
+
 ////////////////////////////////////////////////////////////////////////////////
 /// Cell Encoder
 
@@ -28,7 +30,6 @@ uint32_t decode(const uint32_t& r, const uint32_t& g, const uint32_t& b) {
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Index Map
-
 IndexMap::IndexMap(int32_t w, int32_t h, int32_t count)
     : width(w), height(h), m_numEncoded(count) {
   m_data = QVector<uint32_t>(w * h);
@@ -105,7 +106,8 @@ VoronoiDiagram::~VoronoiDiagram() {
 }
 
 IndexMap VoronoiDiagram::calculate(const QVector<QVector2D>& points) {
-  assert(!points.empty());
+//  assert(!points.empty());
+  Assert(!points.empty(), "This image cannot be used for CMYK color splitting!");
 
   m_context->makeCurrent(m_surface);
 
