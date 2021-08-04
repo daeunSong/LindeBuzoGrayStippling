@@ -245,7 +245,17 @@ SettingsWidget::SettingsWidget(StippleViewer *stippleViewer, QWidget *parent)
   QGroupBox *startGroup = new QGroupBox("Run Algorithm:", this);
   QVBoxLayout *startLayout = new QVBoxLayout(startGroup);
 
+  QCheckBox *interactiveDisplay =
+      new QCheckBox("Use interactive display", this);
+  interactiveDisplay->setChecked(m_params.interactiveDisplay);
+  interactiveDisplay->setToolTip(
+      "If enabled the intermediate results will "
+      "be displayed interactively. ");
+  connect(interactiveDisplay, &QCheckBox::clicked,
+          [this](bool value) { m_params.interactiveDisplay = value; });
+
   QPushButton *startButton = new QPushButton("Start", this);
+  startLayout->addWidget(interactiveDisplay);
   startLayout->addWidget(startButton);
 
   connect(startButton, &QPushButton::released,

@@ -154,6 +154,9 @@ void StippleViewer::stipple(const LBGStippling::Params params) {
   // TODO: Handle return value
   if (!params.colorSplit) {
     std::vector<Stipple> black =  m_stippling.stipple(m_image, params, Qt::black); //black
+    if (!params.interactiveDisplay) {
+      displayPoints(black);
+    }
   }
   else {
     std::vector<Stipple> cyan = m_stippling.stipple(m_image_c, params, QColor(0,255,255,180)); //cyan

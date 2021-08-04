@@ -166,9 +166,15 @@ std::vector<Stipple> LBGStippling::stipple(const QImage &density,
       ++status.splits;
     }
     status.size = stipples.size();
+    if (params.interactiveDisplay) {
+      m_stippleCallback(stipples);
+    }
     m_statusCallback(status);
 
     ++status.iteration;
+  }
+  if (!params.interactiveDisplay && !params.colorSplit) {
+    m_stippleCallback(stipples);
   }
   clock_t end_time = clock();
   double time = double(end_time - begin_time)/CLOCKS_PER_SEC*1000;
