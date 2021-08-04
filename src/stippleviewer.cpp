@@ -3,6 +3,7 @@
 #include <QCoreApplication>
 #include <QPrinter>
 #include <QSvgGenerator>
+#include <QImage>
 
 StippleViewer::StippleViewer(const QImage &img, QWidget *parent)
     : QGraphicsView(parent), m_image(img) {
@@ -32,6 +33,40 @@ StippleViewer::StippleViewer(const QImage &img, QWidget *parent)
 void StippleViewer::displayPoints(const std::vector<Stipple> &stipples) {
   this->scene()->clear();
   for (const auto &s : stipples) {
+    double x = static_cast<double>(s.pos.x() * m_image.width() - s.size / 2.0f);
+    double y =
+        static_cast<double>(s.pos.y() * m_image.height() - s.size / 2.0f);
+    double size = static_cast<double>(s.size);
+    this->scene()->addEllipse(x, y, size, size, Qt::NoPen, s.color);
+  }
+  // TODO: Fix event handling
+  QCoreApplication::processEvents();
+}
+
+void StippleViewer::displayPoints(const std::vector<Stipple> &stipples_c, const std::vector<Stipple> &stipples_m, const std::vector<Stipple> &stipples_y, const std::vector<Stipple> &stipples_k) {
+  this->scene()->clear();
+  for (const auto &s : stipples_c) {
+    double x = static_cast<double>(s.pos.x() * m_image.width() - s.size / 2.0f);
+    double y =
+        static_cast<double>(s.pos.y() * m_image.height() - s.size / 2.0f);
+    double size = static_cast<double>(s.size);
+    this->scene()->addEllipse(x, y, size, size, Qt::NoPen, s.color);
+  }
+  for (const auto &s : stipples_m) {
+    double x = static_cast<double>(s.pos.x() * m_image.width() - s.size / 2.0f);
+    double y =
+        static_cast<double>(s.pos.y() * m_image.height() - s.size / 2.0f);
+    double size = static_cast<double>(s.size);
+    this->scene()->addEllipse(x, y, size, size, Qt::NoPen, s.color);
+  }
+  for (const auto &s : stipples_y) {
+    double x = static_cast<double>(s.pos.x() * m_image.width() - s.size / 2.0f);
+    double y =
+        static_cast<double>(s.pos.y() * m_image.height() - s.size / 2.0f);
+    double size = static_cast<double>(s.size);
+    this->scene()->addEllipse(x, y, size, size, Qt::NoPen, s.color);
+  }
+  for (const auto &s : stipples_k) {
     double x = static_cast<double>(s.pos.x() * m_image.width() - s.size / 2.0f);
     double y =
         static_cast<double>(s.pos.y() * m_image.height() - s.size / 2.0f);
@@ -96,7 +131,37 @@ void StippleViewer::setInputImage(const QImage &img) {
 }
 
 void StippleViewer::stipple(const LBGStippling::Params params) {
+  // Split images in CMYK
+//  m_image.convertToFormat(QImage::Format_RGBA8888);
+  QImage m_image_c = m_image.copy();
+  QImage m_image_m = m_image.copy();
+  QImage m_image_y = m_image.copy();
+  QImage m_image_k = m_image.copy();
+
+  for(int j = 0; j < m_image.height(); j++) {
+    for(int i = 0; i < m_image.width(); i++) {
+      int c = 0, m = 0, y = 0, k = 0;
+      QColor oldColor = m_image.pixel(i, j);
+      oldColor = oldColor.toCmyk();
+      oldColor.getCmyk(&c, &m, &y, &k);
+      m_image_c.setPixel(i, j, QColor::fromCmyk(c,0,0,0).toRgb().rgba());
+      m_image_m.setPixel(i, j, QColor::fromCmyk(0,m,0,0).toRgb().rgba());
+      m_image_y.setPixel(i, j, QColor::fromCmyk(0,0,y,0).toRgb().rgba());
+      m_image_k.setPixel(i, j, QColor::fromCmyk(0,0,0,k).toRgb().rgba());
+    }
+  }
+
   // TODO: Handle return value
-  m_stippling.stipple(m_image, params);
+  if (!params.colorSplit) {
+    std::vector<Stipple> black =  m_stippling.stipple(m_image, params, Qt::black); //black
+  }
+  else {
+    std::vector<Stipple> cyan = m_stippling.stipple(m_image_c, params, QColor(0,255,255,180)); //cyan
+    std::vector<Stipple> magenta = m_stippling.stipple(m_image_m, params, QColor(255,0,255,180)); //magenta
+    std::vector<Stipple> yellow = m_stippling.stipple(m_image_y, params, QColor(255,255,0,180)); //yellow
+    std::vector<Stipple> black = m_stippling.stipple(m_image_k, params, QColor(0,0,0,180)); //black
+    displayPoints(cyan, magenta, yellow, black);
+  }
+
   emit finished();
 }

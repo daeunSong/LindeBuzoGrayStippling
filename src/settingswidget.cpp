@@ -7,6 +7,23 @@ SettingsWidget::SettingsWidget(StippleViewer *stippleViewer, QWidget *parent)
   setLayout(layout);
   setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 
+  // color related stuff
+  QGroupBox *colorGroup = new QGroupBox("Color Settings:", this);
+  QCheckBox *colorSplit =
+      new QCheckBox("Use CMYK color split", this);
+  colorSplit->setChecked(m_params.colorSplit);
+  colorSplit->setToolTip(
+      "If enabled the algorithm will automatically "
+      "split the images into CMYK color spaces. ");
+  connect(colorSplit, &QCheckBox::clicked,
+          [this](bool value) { m_params.colorSplit = value; });
+
+  QGridLayout *colorGroupLayout = new QGridLayout(colorGroup);
+  colorGroup->setLayout(colorGroupLayout);
+  colorGroupLayout->addWidget(colorSplit, 0, 0);
+
+  layout->addWidget(colorGroup);
+
   // point related stuff
   QGroupBox *pointGroup = new QGroupBox("Point Settings:", this);
 

@@ -90,12 +90,12 @@ void LBGStippling::setStippleCallback(Report<std::vector<Stipple>> stippleCB) {
 }
 
 std::vector<Stipple> LBGStippling::stipple(const QImage &density,
-                                           const Params &params) const {
+                                           const Params &params, const QColor color) const {
   QImage densityGray =
       density
           .scaledToWidth(params.superSamplingFactor * density.width(),
-                         Qt::SmoothTransformation)
-          .convertToFormat(QImage::Format_Grayscale8);
+                         Qt::SmoothTransformation);
+//          .convertToFormat(QImage::Format_Grayscale8);
 
   VoronoiDiagram voronoi(densityGray);
 
@@ -133,7 +133,7 @@ std::vector<Stipple> LBGStippling::stipple(const QImage &density,
       if (totalDensity < getSplitValueUpper(diameter, hysteresis,
                                             params.superSamplingFactor)) {
         // cell size within acceptable range - keep
-        stipples.push_back({cell.centroid, diameter, Qt::black});
+        stipples.push_back({cell.centroid, diameter, color});//Qt::black});
         continue;
       }
 
@@ -166,7 +166,6 @@ std::vector<Stipple> LBGStippling::stipple(const QImage &density,
       ++status.splits;
     }
     status.size = stipples.size();
-    m_stippleCallback(stipples);
     m_statusCallback(status);
 
     ++status.iteration;

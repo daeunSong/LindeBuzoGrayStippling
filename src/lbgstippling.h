@@ -16,10 +16,12 @@ struct Stipple {
 class LBGStippling {
  public:
   struct Params {
-    size_t initialPoints = 1;
-    float initialPointSize = 4.0f;
+    bool colorSplit = false;
 
-    bool adaptivePointSize = true;
+    size_t initialPoints = 1;
+    float initialPointSize = 2.0f;
+
+    bool adaptivePointSize = false;
     float pointSizeMin = 2.0f;
     float pointSizeMax = 4.0f;
 
@@ -44,7 +46,7 @@ class LBGStippling {
   LBGStippling();
 
   std::vector<Stipple> stipple(const QImage& density,
-                               const Params& params) const;
+                               const Params& params, const QColor color) const;
 
   // TODO: Rename and method chaining.
   void setStatusCallback(Report<Status> statusCB);
