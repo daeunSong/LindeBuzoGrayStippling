@@ -21,6 +21,7 @@ StippleViewer::StippleViewer(const QImage &img, QWidget *parent)
   this->scene()->addPixmap(QPixmap::fromImage(m_image));
 
   m_stippling = LBGStippling();
+  m_TSP = TSP();
   m_stippling.setStatusCallback([this](const auto &status) {
     emit iterationStatus(status.iteration + 1, status.size, status.splits,
                          status.merges, status.hysteresis);
@@ -43,7 +44,8 @@ void StippleViewer::displayPoints(const std::vector<Stipple> &stipples) {
   QCoreApplication::processEvents();
 }
 
-void StippleViewer::displayPoints(const std::vector<Stipple> &stipples_c, const std::vector<Stipple> &stipples_m, const std::vector<Stipple> &stipples_y, const std::vector<Stipple> &stipples_k) {
+void StippleViewer::displayPoints(const std::vector<Stipple> &stipples_c, const std::vector<Stipple> &stipples_m,
+                          const std::vector<Stipple> &stipples_y, const std::vector<Stipple> &stipples_k) {
   this->scene()->clear();
   for (const auto &s : stipples_c) {
     double x = static_cast<double>(s.pos.x() * m_image.width() - s.size / 2.0f);
@@ -72,6 +74,26 @@ void StippleViewer::displayPoints(const std::vector<Stipple> &stipples_c, const 
         static_cast<double>(s.pos.y() * m_image.height() - s.size / 2.0f);
     double size = static_cast<double>(s.size);
     this->scene()->addEllipse(x, y, size, size, Qt::NoPen, s.color);
+  }
+  // TODO: Fix event handling
+  QCoreApplication::processEvents();
+}
+
+void StippleViewer::displayTSP(const std::vector<Stipple> &stipples, const std::vector<int> &solution) {
+//  this->scene()->clear();
+  const QPen pen = QPen(stipples[0].color);
+
+  double x1 = stipples[solution[0]].pos.x() * m_image.width() - stipples[solution[0]].size / 2.0f;
+  double y1 = stipples[solution[0]].pos.y() * m_image.height() - stipples[solution[0]].size / 2.0f;
+
+  for (int i = 1; i < solution.size(); i ++) {
+    double x2 = static_cast<double>(stipples[solution[i]].pos.x() * m_image.width()
+                                                                - stipples[solution[i]].size / 2.0f);
+    double y2 =
+        static_cast<double>(stipples[solution[i]].pos.y() * m_image.height()
+                                                                - stipples[solution[i]].size / 2.0f);
+    this->scene()->addLine(x1, y1, x2, y2, pen);
+    x1 = x2; y1 = y2;
   }
   // TODO: Fix event handling
   QCoreApplication::processEvents();
@@ -151,11 +173,19 @@ void StippleViewer::stipple(const LBGStippling::Params params) {
     }
   }
 
+  std::vector<Stipple> stipples;
+
   // TODO: Handle return value
   if (!params.colorSplit) {
     std::vector<Stipple> black =  m_stippling.stipple(m_image, params, Qt::black); //black
     if (!params.interactiveDisplay) {
       displayPoints(black);
+    }
+//    std::copy(black.begin(), black.end(), stipples.begin());
+    if (params.solveTSP) {
+      this->scene()->clear();
+      m_TSP.solve(black);
+      displayTSP(black, m_TSP.solution);
     }
   }
   else {
@@ -164,7 +194,21 @@ void StippleViewer::stipple(const LBGStippling::Params params) {
     std::vector<Stipple> yellow = m_stippling.stipple(m_image_y, params, QColor(255,255,0,180)); //yellow
     std::vector<Stipple> black = m_stippling.stipple(m_image_k, params, QColor(0,0,0,180)); //black
     displayPoints(cyan, magenta, yellow, black);
+//    std::copy(black.begin(), black.end(), stipples.begin());
+    if (params.solveTSP) {
+      this->scene()->clear();
+      m_TSP.solve(cyan);
+      displayTSP(cyan, m_TSP.solution);
+      m_TSP.solve(magenta);
+      displayTSP(magenta, m_TSP.solution);
+      m_TSP.solve(yellow);
+      displayTSP(yellow, m_TSP.solution);
+      m_TSP.solve(black);
+      displayTSP(black, m_TSP.solution);
+    }
   }
 
   emit finished();
+//  m_TSPSolver.solve(stipples);
+
 }

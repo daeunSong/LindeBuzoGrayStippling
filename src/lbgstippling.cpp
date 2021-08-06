@@ -123,8 +123,7 @@ std::vector<Stipple> LBGStippling::stipple(const QImage &density,
       const float diameter = stippleSize(cell, params);
 
       if (totalDensity < getSplitValueLower(diameter, hysteresis,
-                                            params.superSamplingFactor) ||
-          cell.area == 0.0f) {
+                                            params.superSamplingFactor) || cell.area == 0.0f) {
         // cell too small - merge
         ++status.merges;
         continue;

@@ -254,8 +254,17 @@ SettingsWidget::SettingsWidget(StippleViewer *stippleViewer, QWidget *parent)
   connect(interactiveDisplay, &QCheckBox::clicked,
           [this](bool value) { m_params.interactiveDisplay = value; });
 
+  QCheckBox *solveTSP =
+      new QCheckBox("Solve TSP Art", this);
+  solveTSP->setChecked(m_params.solveTSP);
+  solveTSP->setToolTip(
+      "If enabled proceeds to solve TSP Art ");
+  connect(solveTSP, &QCheckBox::clicked,
+          [this](bool value) { m_params.solveTSP = value; });
+
   QPushButton *startButton = new QPushButton("Start", this);
   startLayout->addWidget(interactiveDisplay);
+  startLayout->addWidget(solveTSP);
   startLayout->addWidget(startButton);
 
   connect(startButton, &QPushButton::released,

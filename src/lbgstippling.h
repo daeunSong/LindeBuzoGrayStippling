@@ -32,6 +32,7 @@ class LBGStippling {
     float hysteresisDelta = 0.01f;
 
     bool interactiveDisplay = true;
+    bool solveTSP = false;
   };
 
   struct Status {
