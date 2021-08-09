@@ -29,6 +29,7 @@ class TSP {
 
   TSP();
 
+  void writeDataFile (const std::vector<Stipple> &stipples);
   void solve (const std::vector<Stipple> &stipples);
 
 };

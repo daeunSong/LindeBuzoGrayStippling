@@ -13,21 +13,8 @@ TSP::TSP () {
 
 };
 
-//Receive a symmetric 2D distance matrix (dist) and create a TSP optimal tour (tour)
-//void solve(vector<vector<int> > * dist, vector<int> * tour){
-void TSP::solve(const std::vector<Stipple> &stipples) {
-
-  int rval = 0; //Concorde functions return 1 if something fails
-  double szeit; //Measure cpu time
-
-  std::string str = "temp.tsp";
-  m_TSPSolver.name = new char[str.size() + 1];
-  std::copy(str.begin(), str.end(), m_TSPSolver.name);
-  m_TSPSolver.name[str.size()] = '\0';
-
-
-  // TODO: properly figure out Concorde's CCdatagroup format and
-  // initialize this object directly instead of going via file.
+// Write .tsp file
+void TSP::writeDataFile (const std::vector<Stipple> &stipples) {
   FILE *out = fopen (m_TSPSolver.name, "w");
   m_TSPSolver. ncount = stipples.size();
 
@@ -41,7 +28,23 @@ void TSP::solve(const std::vector<Stipple> &stipples) {
   }
   fprintf(out, "EOF\n");
   fclose(out);
+}
 
+//Receive a symmetric 2D distance matrix (dist) and create a TSP optimal tour (tour)
+//void solve(vector<vector<int> > * dist, vector<int> * tour){
+void TSP::solve(const std::vector<Stipple> &stipples) {
+
+  int rval = 0; //Concorde functions return 1 if something fails
+  double szeit; //Measure cpu time
+
+  std::string str = "temp.tsp";
+  m_TSPSolver.name = new char[str.size() + 1];
+  std::copy(str.begin(), str.end(), m_TSPSolver.name);
+  m_TSPSolver.name[str.size()] = '\0';
+
+  // TODO: properly figure out Concorde's CCdatagroup format and
+  // initialize this object directly instead of going via file.
+  writeDataFile(stipples);
 
   CCrandstate rstate;
   int seed = rand();
