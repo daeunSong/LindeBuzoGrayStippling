@@ -4,6 +4,7 @@
 #include <QGraphicsView>
 #include <iostream>
 #include <QPen>
+#include <omp.h>
 
 #include "lbgstippling.h"
 #include "tsp.h"

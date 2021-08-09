@@ -209,6 +209,10 @@ void StippleViewer::stipple(const LBGStippling::Params params) {
   }
 
   emit finished();
+  # pragma omp parallel
+  {
+    printf("Hello OpenMP thread id %d\n", omp_get_thread_num());
+  }
 //  m_TSPSolver.solve(stipples);
 
 }
