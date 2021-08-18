@@ -166,6 +166,12 @@ void StippleViewer::stipple(const LBGStippling::Params params) {
       QColor oldColor = m_image.pixel(i, j);
       oldColor = oldColor.toCmyk();
       oldColor.getCmyk(&c, &m, &y, &k);
+//      std::cout << c << " " << m << " " << y << " " << k << std::endl;
+      // thresholding the values
+      c > 30? c = c : c = 0;
+      m > 40? m = m : m = 0;
+      y > 5? y = y : y = 0;
+      k > 60? k = k : k = 0;
       m_image_c.setPixel(i, j, QColor::fromCmyk(c,0,0,0).toRgb().rgba());
       m_image_m.setPixel(i, j, QColor::fromCmyk(0,m,0,0).toRgb().rgba());
       m_image_y.setPixel(i, j, QColor::fromCmyk(0,0,y,0).toRgb().rgba());
@@ -181,6 +187,9 @@ void StippleViewer::stipple(const LBGStippling::Params params) {
     if (!params.interactiveDisplay) {
       displayPoints(black);
     }
+    FILE *out = fopen ("log.txt", "w");
+    fprintf (out, "Black: %d\n", black.size());
+    fclose(out);
 //    std::copy(black.begin(), black.end(), stipples.begin());
     if (params.solveTSP) {
       this->scene()->clear();
@@ -194,6 +203,13 @@ void StippleViewer::stipple(const LBGStippling::Params params) {
     std::vector<Stipple> yellow = m_stippling.stipple(m_image_y, params, QColor(255,255,0,180)); //yellow
     std::vector<Stipple> black = m_stippling.stipple(m_image_k, params, QColor(0,0,0,180)); //black
     displayPoints(cyan, magenta, yellow, black);
+
+    FILE *out = fopen ("log.txt", "w");
+    fprintf (out, "Cyan: %d\n", cyan.size());
+    fprintf (out, "Magenta: %d\n", magenta.size());
+    fprintf (out, "Yellow: %d\n", yellow.size());
+    fprintf (out, "Black: %d\n", black.size());
+    fclose(out);
 //    std::copy(black.begin(), black.end(), stipples.begin());
     if (params.solveTSP) {
       this->scene()->clear();
