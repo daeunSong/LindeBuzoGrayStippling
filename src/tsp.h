@@ -15,7 +15,7 @@ class TSP {
     double *in_val = (double *) NULL; //Can be used to specify an initial upperbound (it can be NULL)
     int *in_tour = (int *) NULL; //Gives a starting tour in node node node format (it can be NULL)
     char *name = (char *) NULL; //Specifes a char string that will be used to name various files that are written during the branch and bound search
-    double timebound_ = 60;
+    double timebound_ = 100;
     double *timebound = &timebound_;//(double *) NULL; //Run time limit
     int success; //1 if the run finished normally, and set to 0 if the search was terminated early (by hitting some predefined limit)
     int foundtour; //1 if a tour has been found (if success is 0, then it may not be the optimal tour)
@@ -24,13 +24,13 @@ class TSP {
   };
 
   TSPSolver m_TSPSolver;
-  double solvetime;
-  std::vector<int> solution;  // index of the tour
+//  double solvetime;
+//  std::vector<int> solution;  // index of the tour
 
   TSP();
 
   void writeDataFile (const std::vector<Stipple> &stipples);
-  void solve (const std::vector<Stipple> &stipples);
+  std::tuple<std::vector<int>,double> solve (const std::vector<Stipple> &stipples);
 
 };
 #endif  // TSP_H

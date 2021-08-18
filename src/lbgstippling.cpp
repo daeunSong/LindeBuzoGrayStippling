@@ -89,7 +89,7 @@ void LBGStippling::setStippleCallback(Report<std::vector<Stipple>> stippleCB) {
   m_stippleCallback = stippleCB;
 }
 
-std::vector<Stipple> LBGStippling::stipple(const QImage &density,
+std::tuple<std::vector<Stipple>,double> LBGStippling::stipple(const QImage &density,
                                            const Params &params, const QColor color) const {
   QImage densityGray =
       density
@@ -178,7 +178,7 @@ std::vector<Stipple> LBGStippling::stipple(const QImage &density,
   clock_t end_time = clock();
   double time = double(end_time - begin_time)/CLOCKS_PER_SEC*1000;
 
-  std::cout << "TIME: " << time << " ms" << std::endl;
+//  std::cout << "TIME: " << time << " ms" << std::endl;
 
-  return stipples;
+  return {stipples, time};
 }

@@ -32,7 +32,7 @@ void TSP::writeDataFile (const std::vector<Stipple> &stipples) {
 
 //Receive a symmetric 2D distance matrix (dist) and create a TSP optimal tour (tour)
 //void solve(vector<vector<int> > * dist, vector<int> * tour){
-void TSP::solve(const std::vector<Stipple> &stipples) {
+std::tuple<std::vector<int>,double> TSP::solve(const std::vector<Stipple> &stipples) {
 
   int rval = 0; //Concorde functions return 1 if something fails
   double szeit; //Measure cpu time
@@ -66,11 +66,14 @@ void TSP::solve(const std::vector<Stipple> &stipples) {
                               &m_TSPSolver.hit_timebound, m_TSPSolver.silent, &rstate);
 
   clock_t end_time = clock();
-  solvetime = double(end_time - begin_time)/CLOCKS_PER_SEC*1000;
-  std::cout << "TIME: " << solvetime << " ms" << std::endl;
+  double solvetime = double(end_time - begin_time)/CLOCKS_PER_SEC*1000;
+//  std::cout << "TIME: " << solvetime << " ms" << std::endl;
 
+  std::vector<int> solution;
   solution.assign(m_TSPSolver.out_tour, m_TSPSolver.out_tour + m_TSPSolver.ncount);
 
   CC_IFFREE (m_TSPSolver.out_tour, int);
+
+  return {solution,solvetime};
 }
 

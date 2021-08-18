@@ -5,6 +5,7 @@
 
 #include <QImage>
 #include <QVector2D>
+#include <tuple>
 
 // TODO: Color is only used for debugging
 struct Stipple {
@@ -32,7 +33,10 @@ class LBGStippling {
     float hysteresisDelta = 0.01f;
 
     bool interactiveDisplay = true;
+    bool saveLog = false;
     bool solveTSP = false;
+
+    QString fileName = "input1";
   };
 
   struct Status {
@@ -48,7 +52,7 @@ class LBGStippling {
 
   LBGStippling();
 
-  std::vector<Stipple> stipple(const QImage& density,
+  std::tuple<std::vector<Stipple>,double> stipple(const QImage& density,
                                const Params& params, const QColor color) const;
 
   // TODO: Rename and method chaining.

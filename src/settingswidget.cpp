@@ -168,7 +168,10 @@ SettingsWidget::SettingsWidget(StippleViewer *stippleViewer, QWidget *parent)
         this, tr("Open Image"), QString(),
         tr("Image Files (*.png *.jpg *.bmp *.jpeg)"));
 
-    if (path.isEmpty()) return;
+    if (!path.isEmpty()) {
+       m_params.fileName = path.section("/",-1).section(".",0,0);
+//      m_params.fileName = file.toUtf8().constData();
+    }
 
     disableSaveButtons();
     QImage img(path);
@@ -254,6 +257,14 @@ SettingsWidget::SettingsWidget(StippleViewer *stippleViewer, QWidget *parent)
   connect(interactiveDisplay, &QCheckBox::clicked,
           [this](bool value) { m_params.interactiveDisplay = value; });
 
+  QCheckBox *saveLog =
+      new QCheckBox("Save the logs", this);
+  saveLog->setChecked(m_params.saveLog);
+  saveLog->setToolTip(
+      "If enabled the logs are saved in a text file. ");
+  connect(saveLog, &QCheckBox::clicked,
+          [this](bool value) { m_params.saveLog = value; });
+
   QCheckBox *solveTSP =
       new QCheckBox("Solve TSP Art", this);
   solveTSP->setChecked(m_params.solveTSP);
@@ -264,6 +275,7 @@ SettingsWidget::SettingsWidget(StippleViewer *stippleViewer, QWidget *parent)
 
   QPushButton *startButton = new QPushButton("Start", this);
   startLayout->addWidget(interactiveDisplay);
+  startLayout->addWidget(saveLog);
   startLayout->addWidget(solveTSP);
   startLayout->addWidget(startButton);
 

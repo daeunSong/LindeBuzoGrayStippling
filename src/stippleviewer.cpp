@@ -5,6 +5,8 @@
 #include <QSvgGenerator>
 #include <QImage>
 
+#define qstr QString::fromStdString
+
 StippleViewer::StippleViewer(const QImage &img, QWidget *parent)
     : QGraphicsView(parent), m_image(img) {
   setInteractive(false);
@@ -99,6 +101,16 @@ void StippleViewer::displayTSP(const std::vector<Stipple> &stipples, const std::
   QCoreApplication::processEvents();
 }
 
+void StippleViewer::displayTSP(const std::vector<Stipple> &c, const std::vector<int> &cc,
+                               const std::vector<Stipple> &m, const std::vector<int> &mm,
+                               const std::vector<Stipple> &y, const std::vector<int> &yy,
+                               const std::vector<Stipple> &k, const std::vector<int> &kk) {
+  displayTSP(c, cc);
+  displayTSP(m, mm);
+  displayTSP(y, yy);
+//  displayTSP(k, kk);
+}
+
 QPixmap StippleViewer::getImage() {
   QPixmap pixmap(this->scene()->sceneRect().size().toSize());
   pixmap.fill(Qt::white);
@@ -107,6 +119,11 @@ QPixmap StippleViewer::getImage() {
   painter.setRenderHint(QPainter::Antialiasing, true);
   this->scene()->render(&painter);
   return pixmap;
+}
+
+void StippleViewer::saveImagePNG(const QString &path) {
+  QPixmap map = getImage();
+  map.save(path);
 }
 
 void StippleViewer::saveImageSVG(const QString &path) {
@@ -171,7 +188,7 @@ void StippleViewer::stipple(const LBGStippling::Params params) {
       c > 30? c = c : c = 0;
       m > 40? m = m : m = 0;
       y > 5? y = y : y = 0;
-      k > 60? k = k : k = 0;
+      k > 80? k = k : k = 0;
       m_image_c.setPixel(i, j, QColor::fromCmyk(c,0,0,0).toRgb().rgba());
       m_image_m.setPixel(i, j, QColor::fromCmyk(0,m,0,0).toRgb().rgba());
       m_image_y.setPixel(i, j, QColor::fromCmyk(0,0,y,0).toRgb().rgba());
@@ -179,48 +196,84 @@ void StippleViewer::stipple(const LBGStippling::Params params) {
     }
   }
 
-  std::vector<Stipple> stipples;
+  std::vector<Stipple> stipple_c, stipple_m, stipple_y, stipple_k;
+  double time_stipple_c = 0, time_stipple_m = 0, time_stipple_y = 0, time_stipple_k = 0;
+  std::vector<int> tsp_c, tsp_m, tsp_y, tsp_k;
+  double time_tsp_c = 0, time_tsp_m= 0 , time_tsp_y = 0, time_tsp_k = 0;
 
   // TODO: Handle return value
   if (!params.colorSplit) {
-    std::vector<Stipple> black =  m_stippling.stipple(m_image, params, Qt::black); //black
+    if (params.saveLog) m_image_k.save(qstr("logs/")+params.fileName+qstr("_k.png"));
+
+    tie(stipple_k, time_stipple_k) =  m_stippling.stipple(m_image_k, params, Qt::black); //black
     if (!params.interactiveDisplay) {
-      displayPoints(black);
+      displayPoints(stipple_k);
     }
-    FILE *out = fopen ("log.txt", "w");
-    fprintf (out, "Black: %d\n", black.size());
-    fclose(out);
-//    std::copy(black.begin(), black.end(), stipples.begin());
+    if (params.saveLog) saveImagePNG(qstr("logs/")+params.fileName+qstr("_stipple.png"));
+
     if (params.solveTSP) {
       this->scene()->clear();
-      m_TSP.solve(black);
-      displayTSP(black, m_TSP.solution);
+      tie(tsp_k, time_tsp_k) = m_TSP.solve(stipple_k);
+      displayTSP(stipple_k, tsp_k);
+      if (params.saveLog) saveImagePNG(qstr("logs/")+params.fileName+qstr("_tsp.png"));
+    }
+
+    // LOGGING
+    if (params.saveLog) {
+      std::ofstream log("logs/"+std::string(params.fileName.toUtf8().constData())+"_log.txt");
+      log << params.fileName.toUtf8().constData() << std::endl;
+      log << "COLOR : BLACK\n";
+      log << "K \t" << stipple_k.size() << "\t" << time_stipple_k << " ms\t" << time_tsp_k << "ms\n";
+      log.close();
     }
   }
   else {
-    std::vector<Stipple> cyan = m_stippling.stipple(m_image_c, params, QColor(0,255,255,180)); //cyan
-    std::vector<Stipple> magenta = m_stippling.stipple(m_image_m, params, QColor(255,0,255,180)); //magenta
-    std::vector<Stipple> yellow = m_stippling.stipple(m_image_y, params, QColor(255,255,0,180)); //yellow
-    std::vector<Stipple> black = m_stippling.stipple(m_image_k, params, QColor(0,0,0,180)); //black
-    displayPoints(cyan, magenta, yellow, black);
+    if (params.saveLog){
+      m_image_c.save(qstr("logs/")+params.fileName+qstr("_c.png"));
+      m_image_m.save(qstr("logs/")+params.fileName+qstr("_m.png"));
+      m_image_y.save(qstr("logs/")+params.fileName+qstr("_y.png"));
+      m_image_k.save(qstr("logs/")+params.fileName+qstr("_k.png"));
+    }
 
-    FILE *out = fopen ("log.txt", "w");
-    fprintf (out, "Cyan: %d\n", cyan.size());
-    fprintf (out, "Magenta: %d\n", magenta.size());
-    fprintf (out, "Yellow: %d\n", yellow.size());
-    fprintf (out, "Black: %d\n", black.size());
-    fclose(out);
-//    std::copy(black.begin(), black.end(), stipples.begin());
+    tie(stipple_c, time_stipple_c) = m_stippling.stipple(m_image_c, params, QColor(0,255,255,180)); //cyan
+    if (params.saveLog) saveImagePNG(qstr("logs/")+params.fileName+qstr("_stipple_c.png"));
+    tie(stipple_m, time_stipple_m) = m_stippling.stipple(m_image_m, params, QColor(255,0,255,180)); //magenta
+    if (params.saveLog) saveImagePNG(qstr("logs/")+params.fileName+qstr("_stipple_m.png"));
+    tie(stipple_y, time_stipple_y) = m_stippling.stipple(m_image_y, params, QColor(255,255,0,180)); //yellow
+    if (params.saveLog) saveImagePNG(qstr("logs/")+params.fileName+qstr("_stipple_y.png"));
+    tie(stipple_k, time_stipple_k) = m_stippling.stipple(m_image_k, params, QColor(0,0,0,180)); //black
+    if (params.saveLog) saveImagePNG(qstr("logs/")+params.fileName+qstr("_stipple_k.png"));
+    displayPoints(stipple_c, stipple_m, stipple_y, stipple_k);
+    if (params.saveLog) saveImagePNG(qstr("logs/")+params.fileName+qstr("_stipple.png"));
+
     if (params.solveTSP) {
       this->scene()->clear();
-      m_TSP.solve(cyan);
-      displayTSP(cyan, m_TSP.solution);
-      m_TSP.solve(magenta);
-      displayTSP(magenta, m_TSP.solution);
-      m_TSP.solve(yellow);
-      displayTSP(yellow, m_TSP.solution);
-      m_TSP.solve(black);
-      displayTSP(black, m_TSP.solution);
+      tie(tsp_c, time_tsp_c) = m_TSP.solve(stipple_c);
+      if (params.interactiveDisplay) displayTSP(stipple_c, tsp_c);
+      if (params.saveLog) saveImagePNG(qstr("logs/")+params.fileName+qstr("_tsp_c.png"));
+      tie(tsp_m, time_tsp_m) = m_TSP.solve(stipple_m);
+      if (params.interactiveDisplay) this->scene()->clear(); displayTSP(stipple_m, tsp_m);
+      if (params.saveLog) saveImagePNG(qstr("logs/")+params.fileName+qstr("_tsp_m.png"));
+      tie(tsp_y, time_tsp_y) = m_TSP.solve(stipple_y);
+      if (params.interactiveDisplay) this->scene()->clear(); displayTSP(stipple_y, tsp_y);
+      if (params.saveLog) saveImagePNG(qstr("logs/")+params.fileName+qstr("_tsp_y.png"));
+      tie(tsp_k, time_tsp_k) = m_TSP.solve(stipple_k);
+      if (params.interactiveDisplay) this->scene()->clear(); displayTSP(stipple_k, tsp_k);
+      if (params.saveLog) saveImagePNG(qstr("logs/")+params.fileName+qstr("_tsp_k.png"));
+      displayTSP(stipple_c, tsp_c, stipple_m, tsp_m, stipple_y, tsp_y, stipple_k, tsp_k);
+      if (params.saveLog) saveImagePNG(qstr("logs/")+params.fileName+qstr("_tsp.png"));
+    }
+
+    // LOGGING
+    if (params.saveLog) {
+      std::ofstream log("logs/"+std::string(params.fileName.toUtf8().constData())+"_log.txt");
+      log << params.fileName.toUtf8().constData() << std::endl;
+      log << "COLOR : CMYK\n";
+      log << "C \t" << stipple_c.size() << "\t" << time_stipple_c  << " ms\t" << time_tsp_c << "ms\n";
+      log << "M \t" << stipple_m.size() << "\t" << time_stipple_m << " ms\t" << time_tsp_m << "ms\n";
+      log << "Y \t" << stipple_y.size() << "\t" << time_stipple_y << " ms\t" << time_tsp_y << "ms\n";
+      log << "K \t" << stipple_k.size() << "\t" << time_stipple_k << " ms\t" << time_tsp_k << "ms\n";
+      log.close();
     }
   }
 
