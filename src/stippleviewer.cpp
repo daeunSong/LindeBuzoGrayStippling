@@ -121,6 +121,23 @@ QPixmap StippleViewer::getImage() {
   return pixmap;
 }
 
+void StippleViewer::saveRoboticPath (const std::vector<Stipple> &stipples, const std::vector<int> &solution, const QString fname, const std::string extension) {
+  std::ofstream out("logs/"+std::string(fname.toUtf8().constData())+"_path_"+extension+".txt");
+  out << m_image.width() << " " << m_image.height() << std::endl; // save the drawing size
+  int count = 0;
+  for (auto i: solution) {
+    out << stipples[i].pos.x() << " " << stipples[i].pos.y() << std::endl;
+    count ++;
+    if (count > 4999) {
+      out << "End" << std::endl;
+      out << stipples[i].pos.x() << " " << stipples[i].pos.y() << std::endl;
+      count = 0;
+    }
+  }
+  out << "End" << std::endl;
+  out.close();
+}
+
 void StippleViewer::saveImagePNG(const QString &path) {
   QPixmap map = getImage();
   map.save(path);
@@ -185,10 +202,10 @@ void StippleViewer::stipple(const LBGStippling::Params params) {
       oldColor.getCmyk(&c, &m, &y, &k);
 //      std::cout << c << " " << m << " " << y << " " << k << std::endl;
       // thresholding the values
-      c > 30? c = c : c = 0;
-      m > 40? m = m : m = 0;
-      y > 5? y = y : y = 0;
-      k > 80? k = k : k = 0;
+//      c > 30? c = c : c = 0;
+//      m > 50? m = m : m = 0;
+//      y > 5? y = y : y = 0;
+//      k > 70? k = k : k = 0;
       m_image_c.setPixel(i, j, QColor::fromCmyk(c,0,0,0).toRgb().rgba());
       m_image_m.setPixel(i, j, QColor::fromCmyk(0,m,0,0).toRgb().rgba());
       m_image_y.setPixel(i, j, QColor::fromCmyk(0,0,y,0).toRgb().rgba());
@@ -225,6 +242,8 @@ void StippleViewer::stipple(const LBGStippling::Params params) {
       log << "COLOR : BLACK\n";
       log << "K \t" << stipple_k.size() << "\t" << time_stipple_k << " ms\t" << time_tsp_k << "ms\n";
       log.close();
+
+      saveRoboticPath (stipple_k, tsp_k, params.fileName, "k");
     }
   }
   else {
@@ -274,6 +293,13 @@ void StippleViewer::stipple(const LBGStippling::Params params) {
       log << "Y \t" << stipple_y.size() << "\t" << time_stipple_y << " ms\t" << time_tsp_y << "ms\n";
       log << "K \t" << stipple_k.size() << "\t" << time_stipple_k << " ms\t" << time_tsp_k << "ms\n";
       log.close();
+
+      // save the robotic path
+      saveRoboticPath (stipple_c, tsp_c, params.fileName, "c");
+      saveRoboticPath (stipple_m, tsp_m, params.fileName, "m");
+      saveRoboticPath (stipple_y, tsp_y, params.fileName, "y");
+      saveRoboticPath (stipple_k, tsp_k, params.fileName, "k");
+
     }
   }
 

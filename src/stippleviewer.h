@@ -20,6 +20,7 @@ class StippleViewer : public QGraphicsView {
   void saveImagePNG(const QString &path);
   void saveImageSVG(const QString &path);
   void saveImagePDF(const QString &path);
+  void saveRoboticPath(const std::vector<Stipple> &stipples, const std::vector<int> &solution, const QString fname, const std::string extension);
   void displayPoints(const std::vector<Stipple> &stipples);
   void displayPoints(const std::vector<Stipple> &stipples_c, const std::vector<Stipple> &stipples_m,
                const std::vector<Stipple> &stipples_y, const std::vector<Stipple> &stipples_k);
