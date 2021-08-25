@@ -10,17 +10,69 @@ SettingsWidget::SettingsWidget(StippleViewer *stippleViewer, QWidget *parent)
   // color related stuff
   QGroupBox *colorGroup = new QGroupBox("Color Settings:", this);
   QCheckBox *colorSplit =
-      new QCheckBox("Use CMYK color split", this);
+      new QCheckBox("Use CMYK colors", this);
   colorSplit->setChecked(m_params.colorSplit);
   colorSplit->setToolTip(
       "If enabled the algorithm will automatically "
       "split the images into CMYK color spaces. ");
-  connect(colorSplit, &QCheckBox::clicked,
-          [this](bool value) { m_params.colorSplit = value; });
+  connect(colorSplit, &QCheckBox::clicked, [this](bool value) {
+          m_params.colorSplit = value;
+          SettingsWidget::toggleThresholds(value);});
+
+  QLabel *cyanLabel = new QLabel("Cyan:", this);
+  m_spinCyan = new QSpinBox(this);
+  m_spinCyan->setRange(0, 255);
+  m_spinCyan->setValue(m_params.threshold[0]);
+  m_spinCyan->setSingleStep(5);
+  m_spinCyan->setEnabled(false);
+  m_spinCyan->setToolTip(
+      "Threshold value for color Cyan");
+  connect(m_spinCyan, QOverload<int>::of(&QSpinBox::valueChanged),
+          [this](int value) { m_params.threshold[0] = value; });
+
+  QLabel *magentaLabel = new QLabel("Magenta:", this);
+  m_spinMagenta = new QSpinBox(this);
+  m_spinMagenta->setRange(0, 255);
+  m_spinMagenta->setValue(m_params.threshold[1]);
+  m_spinMagenta->setSingleStep(5);
+  m_spinMagenta->setEnabled(false);
+  m_spinMagenta->setToolTip(
+      "Threshold value for color Magenta");
+  connect(m_spinMagenta, QOverload<int>::of(&QSpinBox::valueChanged),
+          [this](int value) { m_params.threshold[1] = value; });
+
+  QLabel *yellowLabel = new QLabel("Yellow:", this);
+  m_spinYellow = new QSpinBox(this);
+  m_spinYellow->setRange(0, 255);
+  m_spinYellow->setValue(m_params.threshold[2]);
+  m_spinYellow->setSingleStep(5);
+  m_spinYellow->setEnabled(false);
+  m_spinYellow->setToolTip(
+      "Threshold value for color Yellow");
+  connect(m_spinYellow, QOverload<int>::of(&QSpinBox::valueChanged),
+          [this](int value) { m_params.threshold[2] = value; });
+
+  QLabel *blackLabel = new QLabel("Balck:", this);
+  QSpinBox *spinBlack = new QSpinBox(this);
+  spinBlack->setRange(0, 255);
+  spinBlack->setValue(m_params.threshold[3]);
+  spinBlack->setSingleStep(5);
+  spinBlack->setToolTip(
+      "Threshold value for color Black");
+  connect(spinBlack, QOverload<int>::of(&QSpinBox::valueChanged),
+          [this](int value) { m_params.threshold[3] = value; });
 
   QGridLayout *colorGroupLayout = new QGridLayout(colorGroup);
   colorGroup->setLayout(colorGroupLayout);
-  colorGroupLayout->addWidget(colorSplit, 0, 0);
+  colorGroupLayout->addWidget(colorSplit, 0, 0, 1, 2);
+  colorGroupLayout->addWidget(cyanLabel, 1, 0);
+  colorGroupLayout->addWidget(m_spinCyan, 1, 1);
+  colorGroupLayout->addWidget(magentaLabel, 1, 2);
+  colorGroupLayout->addWidget(m_spinMagenta, 1, 3);
+  colorGroupLayout->addWidget(yellowLabel, 2, 0);
+  colorGroupLayout->addWidget(m_spinYellow, 2, 1);
+  colorGroupLayout->addWidget(blackLabel, 2, 2);
+  colorGroupLayout->addWidget(spinBlack, 2, 3);
 
   layout->addWidget(colorGroup);
 
@@ -159,63 +211,6 @@ SettingsWidget::SettingsWidget(StippleViewer *stippleViewer, QWidget *parent)
   algoGroupLayout->addWidget(spinMaxIter, 0, 1);
 
   layout->addWidget(algoGroup);
-
-
-  // threshold related stuff
-  QGroupBox *thresholdGroup = new QGroupBox("Threshold Settings:", this);
-
-  QLabel *cyanLabel = new QLabel("Cyan:", this);
-  QSpinBox *spinCyan = new QSpinBox(this);
-  spinCyan->setRange(0, 255);
-  spinCyan->setValue(m_params.threshold[0]);
-  spinCyan->setSingleStep(5);
-  spinCyan->setToolTip(
-      "Threshold value for color Cyan");
-  connect(spinCyan, QOverload<int>::of(&QSpinBox::valueChanged),
-          [this](int value) { m_params.threshold[0] = value; });
-
-  QLabel *magentaLabel = new QLabel("Magenta:", this);
-  QSpinBox *spinMagenta = new QSpinBox(this);
-  spinMagenta->setRange(0, 255);
-  spinMagenta->setValue(m_params.threshold[1]);
-  spinMagenta->setSingleStep(5);
-  spinMagenta->setToolTip(
-      "Threshold value for color Magenta");
-  connect(spinMagenta, QOverload<int>::of(&QSpinBox::valueChanged),
-          [this](int value) { m_params.threshold[1] = value; });
-
-  QLabel *yellowLabel = new QLabel("Yellow:", this);
-  QSpinBox *spinYellow = new QSpinBox(this);
-  spinYellow->setRange(0, 255);
-  spinYellow->setValue(m_params.threshold[2]);
-  spinYellow->setSingleStep(5);
-  spinYellow->setToolTip(
-      "Threshold value for color Yellow");
-  connect(spinYellow, QOverload<int>::of(&QSpinBox::valueChanged),
-          [this](int value) { m_params.threshold[2] = value; });
-
-  QLabel *blackLabel = new QLabel("Balck:", this);
-  QSpinBox *spinBlack = new QSpinBox(this);
-  spinBlack->setRange(0, 255);
-  spinBlack->setValue(m_params.threshold[3]);
-  spinBlack->setSingleStep(5);
-  spinBlack->setToolTip(
-      "Threshold value for color Black");
-  connect(spinBlack, QOverload<int>::of(&QSpinBox::valueChanged),
-          [this](int value) { m_params.threshold[3] = value; });
-
-  QGridLayout *thresholdGroupLayout = new QGridLayout(thresholdGroup);
-  thresholdGroup->setLayout(thresholdGroupLayout);
-  thresholdGroupLayout->addWidget(cyanLabel, 0, 0);
-  thresholdGroupLayout->addWidget(spinCyan, 0, 1);
-  thresholdGroupLayout->addWidget(magentaLabel, 0, 2);
-  thresholdGroupLayout->addWidget(spinMagenta, 0, 3);
-  thresholdGroupLayout->addWidget(yellowLabel, 1, 0);
-  thresholdGroupLayout->addWidget(spinYellow, 1, 1);
-  thresholdGroupLayout->addWidget(blackLabel, 1, 2);
-  thresholdGroupLayout->addWidget(spinBlack, 1, 3);
-
-  layout->addWidget(thresholdGroup);
 
   // open button
   QGroupBox *openBox = new QGroupBox("Open file as input:", this);
@@ -378,4 +373,17 @@ void SettingsWidget::disableSaveButtons() {
   m_savePNG->setEnabled(false);
   m_saveSVG->setEnabled(false);
   m_savePDF->setEnabled(false);
+}
+
+void SettingsWidget::toggleThresholds(bool checked) {
+  if (checked) {
+    m_spinCyan->setEnabled(true);
+    m_spinMagenta->setEnabled(true);
+    m_spinYellow->setEnabled(true);
+  }
+  else {
+    m_spinCyan->setEnabled(false);
+    m_spinMagenta->setEnabled(false);
+    m_spinYellow->setEnabled(false);
+  }
 }

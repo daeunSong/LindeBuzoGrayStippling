@@ -16,12 +16,17 @@ class SettingsWidget : public QWidget {
   LBGStippling::Params m_params;
   StippleViewer *m_stippleViewer;
 
+  QSpinBox *m_spinCyan;
+  QSpinBox *m_spinMagenta;
+  QSpinBox *m_spinYellow;
+
   QPushButton *m_savePNG;
   QPushButton *m_saveSVG;
   QPushButton *m_savePDF;
 
   void enableSaveButtons();
   void disableSaveButtons();
+  void toggleThresholds(bool checked);
 };
 
 #endif  // SETTINGSWIDGET_H
