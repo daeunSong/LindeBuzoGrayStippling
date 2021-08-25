@@ -36,6 +36,8 @@ class LBGStippling {
     bool saveLog = false;
     bool solveTSP = false;
 
+    std::vector<int> threshold = {30, 50, 5, 70}; // c, m, y, k threshold value
+
     QString fileName = "input1";
   };
 

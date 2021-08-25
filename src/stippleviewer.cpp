@@ -202,10 +202,10 @@ void StippleViewer::stipple(const LBGStippling::Params params) {
       oldColor.getCmyk(&c, &m, &y, &k);
 //      std::cout << c << " " << m << " " << y << " " << k << std::endl;
       // thresholding the values
-//      c > 30? c = c : c = 0;
-//      m > 50? m = m : m = 0;
-//      y > 5? y = y : y = 0;
-//      k > 70? k = k : k = 0;
+      c > params.threshold[0]? c = c : c = 0;
+      m > params.threshold[1]? m = m : m = 0;
+      y > params.threshold[2]? y = y : y = 0;
+      k > params.threshold[3]? k = k : k = 0;
       m_image_c.setPixel(i, j, QColor::fromCmyk(c,0,0,0).toRgb().rgba());
       m_image_m.setPixel(i, j, QColor::fromCmyk(0,m,0,0).toRgb().rgba());
       m_image_y.setPixel(i, j, QColor::fromCmyk(0,0,y,0).toRgb().rgba());

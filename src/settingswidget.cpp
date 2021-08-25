@@ -49,6 +49,7 @@ SettingsWidget::SettingsWidget(StippleViewer *stippleViewer, QWidget *parent)
           QOverload<double>::of(&QDoubleSpinBox::valueChanged),
           [this](double value) { m_params.initialPointSize = value; });
 
+/*
   QCheckBox *adaptivePointSize =
       new QCheckBox("Use adaptive point size.", this);
   adaptivePointSize->setChecked(m_params.adaptivePointSize);
@@ -80,48 +81,48 @@ SettingsWidget::SettingsWidget(StippleViewer *stippleViewer, QWidget *parent)
   connect(spinMaxPointSize,
           QOverload<double>::of(&QDoubleSpinBox::valueChanged),
           [this](double value) { m_params.pointSizeMax = value; });
-
+*/
   QGridLayout *pointGroupLayout = new QGridLayout(pointGroup);
   pointGroup->setLayout(pointGroupLayout);
   pointGroupLayout->addWidget(initialPointLabel, 0, 0);
   pointGroupLayout->addWidget(spinInitialPoints, 0, 1);
   pointGroupLayout->addWidget(initialPointSizeLabel, 1, 0);
   pointGroupLayout->addWidget(spinInitialPointSize, 1, 1);
-  pointGroupLayout->addWidget(adaptivePointSize, 2, 0);
-  pointGroupLayout->addWidget(minPointSize, 3, 0);
-  pointGroupLayout->addWidget(spinMinPointSize, 3, 1);
-  pointGroupLayout->addWidget(maxPointSize, 4, 0);
-  pointGroupLayout->addWidget(spinMaxPointSize, 4, 1);
+//  pointGroupLayout->addWidget(adaptivePointSize, 2, 0);
+//  pointGroupLayout->addWidget(minPointSize, 3, 0);
+//  pointGroupLayout->addWidget(spinMinPointSize, 3, 1);
+//  pointGroupLayout->addWidget(maxPointSize, 4, 0);
+//  pointGroupLayout->addWidget(spinMaxPointSize, 4, 1);
 
   layout->addWidget(pointGroup);
 
   // algo related stuff
   QGroupBox *algoGroup = new QGroupBox("Algorithm Settings:", this);
 
-  QLabel *hysteresisLabel = new QLabel("Hysteresis:", this);
-  QDoubleSpinBox *spinHysterresis = new QDoubleSpinBox(this);
-  spinHysterresis->setRange(0.1, 3.0);
-  spinHysterresis->setValue(m_params.hysteresis);
-  spinHysterresis->setSingleStep(0.1);
-  spinHysterresis->setToolTip(
-      "How close to 'perfect' the cell size has to be "
-      "in order not to be split:\n Lower values mean "
-      "slower convergence but higher quality results "
-      "and vice versa.");
-  connect(spinHysterresis, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
-          [this](double value) { m_params.hysteresis = value; });
-
-  QLabel *hysteresisDeltaLabel = new QLabel("Hysteresis increment:", this);
-  QDoubleSpinBox *spinHysteresisDelta = new QDoubleSpinBox(this);
-  spinHysteresisDelta->setRange(0.0, 0.1);
-  spinHysteresisDelta->setValue(m_params.hysteresisDelta);
-  spinHysteresisDelta->setSingleStep(0.001);
-  spinHysteresisDelta->setDecimals(3);
-  spinHysteresisDelta->setToolTip(
-      "The increment of the hysteresis in each iteration.");
-  connect(spinHysteresisDelta,
-          QOverload<double>::of(&QDoubleSpinBox::valueChanged),
-          [this](double value) { m_params.hysteresisDelta = value; });
+//  QLabel *hysteresisLabel = new QLabel("Hysteresis:", this);
+//  QDoubleSpinBox *spinHysterresis = new QDoubleSpinBox(this);
+//  spinHysterresis->setRange(0.1, 3.0);
+//  spinHysterresis->setValue(m_params.hysteresis);
+//  spinHysterresis->setSingleStep(0.1);
+//  spinHysterresis->setToolTip(
+//      "How close to 'perfect' the cell size has to be "
+//      "in order not to be split:\n Lower values mean "
+//      "slower convergence but higher quality results "
+//      "and vice versa.");
+//  connect(spinHysterresis, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+//          [this](double value) { m_params.hysteresis = value; });
+//
+//  QLabel *hysteresisDeltaLabel = new QLabel("Hysteresis increment:", this);
+//  QDoubleSpinBox *spinHysteresisDelta = new QDoubleSpinBox(this);
+//  spinHysteresisDelta->setRange(0.0, 0.1);
+//  spinHysteresisDelta->setValue(m_params.hysteresisDelta);
+//  spinHysteresisDelta->setSingleStep(0.001);
+//  spinHysteresisDelta->setDecimals(3);
+//  spinHysteresisDelta->setToolTip(
+//      "The increment of the hysteresis in each iteration.");
+//  connect(spinHysteresisDelta,
+//          QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+//          [this](double value) { m_params.hysteresisDelta = value; });
 
   QLabel *maxIterLabel = new QLabel("Maximum Iterations:", this);
   QSpinBox *spinMaxIter = new QSpinBox(this);
@@ -134,28 +135,87 @@ SettingsWidget::SettingsWidget(StippleViewer *stippleViewer, QWidget *parent)
   connect(spinMaxIter, QOverload<int>::of(&QSpinBox::valueChanged),
           [this](int value) { m_params.maxIterations = value; });
 
-  QLabel *superSampleLabel = new QLabel("Super-Sampling Factor:", this);
-  QSpinBox *spinSuperSample = new QSpinBox(this);
-  spinSuperSample->setRange(1, 3);
-  spinSuperSample->setValue(m_params.superSamplingFactor);
-  spinSuperSample->setToolTip(
-      "Increases the size and percision of the Voronoi "
-      "diagram, but makes the calculation slower.");
-  connect(spinSuperSample, QOverload<int>::of(&QSpinBox::valueChanged),
-          [this](int value) { m_params.superSamplingFactor = value; });
+//  QLabel *superSampleLabel = new QLabel("Super-Sampling Factor:", this);
+//  QSpinBox *spinSuperSample = new QSpinBox(this);
+//  spinSuperSample->setRange(1, 3);
+//  spinSuperSample->setValue(m_params.superSamplingFactor);
+//  spinSuperSample->setToolTip(
+//      "Increases the size and percision of the Voronoi "
+//      "diagram, but makes the calculation slower.");
+//  connect(spinSuperSample, QOverload<int>::of(&QSpinBox::valueChanged),
+//          [this](int value) { m_params.superSamplingFactor = value; });
 
   QGridLayout *algoGroupLayout = new QGridLayout(algoGroup);
   algoGroup->setLayout(algoGroupLayout);
-  algoGroupLayout->addWidget(hysteresisLabel, 0, 0);
-  algoGroupLayout->addWidget(spinHysterresis, 0, 1);
-  algoGroupLayout->addWidget(hysteresisDeltaLabel, 1, 0);
-  algoGroupLayout->addWidget(spinHysteresisDelta, 1, 1);
-  algoGroupLayout->addWidget(maxIterLabel, 2, 0);
-  algoGroupLayout->addWidget(spinMaxIter, 2, 1);
-  algoGroupLayout->addWidget(superSampleLabel, 3, 0);
-  algoGroupLayout->addWidget(spinSuperSample, 3, 1);
+//  algoGroupLayout->addWidget(hysteresisLabel, 0, 0);
+//  algoGroupLayout->addWidget(spinHysterresis, 0, 1);
+//  algoGroupLayout->addWidget(hysteresisDeltaLabel, 1, 0);
+//  algoGroupLayout->addWidget(spinHysteresisDelta, 1, 1);
+//  algoGroupLayout->addWidget(maxIterLabel, 2, 0);
+//  algoGroupLayout->addWidget(spinMaxIter, 2, 1);
+//  algoGroupLayout->addWidget(superSampleLabel, 3, 0);
+//  algoGroupLayout->addWidget(spinSuperSample, 3, 1);
+  algoGroupLayout->addWidget(maxIterLabel, 0, 0);
+  algoGroupLayout->addWidget(spinMaxIter, 0, 1);
 
   layout->addWidget(algoGroup);
+
+
+  // threshold related stuff
+  QGroupBox *thresholdGroup = new QGroupBox("Threshold Settings:", this);
+
+  QLabel *cyanLabel = new QLabel("Cyan:", this);
+  QSpinBox *spinCyan = new QSpinBox(this);
+  spinCyan->setRange(0, 255);
+  spinCyan->setValue(m_params.threshold[0]);
+  spinCyan->setSingleStep(5);
+  spinCyan->setToolTip(
+      "Threshold value for color Cyan");
+  connect(spinCyan, QOverload<int>::of(&QSpinBox::valueChanged),
+          [this](int value) { m_params.threshold[0] = value; });
+
+  QLabel *magentaLabel = new QLabel("Magenta:", this);
+  QSpinBox *spinMagenta = new QSpinBox(this);
+  spinMagenta->setRange(0, 255);
+  spinMagenta->setValue(m_params.threshold[1]);
+  spinMagenta->setSingleStep(5);
+  spinMagenta->setToolTip(
+      "Threshold value for color Magenta");
+  connect(spinMagenta, QOverload<int>::of(&QSpinBox::valueChanged),
+          [this](int value) { m_params.threshold[1] = value; });
+
+  QLabel *yellowLabel = new QLabel("Yellow:", this);
+  QSpinBox *spinYellow = new QSpinBox(this);
+  spinYellow->setRange(0, 255);
+  spinYellow->setValue(m_params.threshold[2]);
+  spinYellow->setSingleStep(5);
+  spinYellow->setToolTip(
+      "Threshold value for color Yellow");
+  connect(spinYellow, QOverload<int>::of(&QSpinBox::valueChanged),
+          [this](int value) { m_params.threshold[2] = value; });
+
+  QLabel *blackLabel = new QLabel("Balck:", this);
+  QSpinBox *spinBlack = new QSpinBox(this);
+  spinBlack->setRange(0, 255);
+  spinBlack->setValue(m_params.threshold[3]);
+  spinBlack->setSingleStep(5);
+  spinBlack->setToolTip(
+      "Threshold value for color Black");
+  connect(spinBlack, QOverload<int>::of(&QSpinBox::valueChanged),
+          [this](int value) { m_params.threshold[3] = value; });
+
+  QGridLayout *thresholdGroupLayout = new QGridLayout(thresholdGroup);
+  thresholdGroup->setLayout(thresholdGroupLayout);
+  thresholdGroupLayout->addWidget(cyanLabel, 0, 0);
+  thresholdGroupLayout->addWidget(spinCyan, 0, 1);
+  thresholdGroupLayout->addWidget(magentaLabel, 0, 2);
+  thresholdGroupLayout->addWidget(spinMagenta, 0, 3);
+  thresholdGroupLayout->addWidget(yellowLabel, 1, 0);
+  thresholdGroupLayout->addWidget(spinYellow, 1, 1);
+  thresholdGroupLayout->addWidget(blackLabel, 1, 2);
+  thresholdGroupLayout->addWidget(spinBlack, 1, 3);
+
+  layout->addWidget(thresholdGroup);
 
   // open button
   QGroupBox *openBox = new QGroupBox("Open file as input:", this);
