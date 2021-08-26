@@ -189,14 +189,57 @@ void StippleViewer::stipple(const LBGStippling::Params params) {
     }
   }
   else {
-    std::vector<Stipple> cyan = m_stippling.stipple(m_image_c, params, QColor(0,255,255,180)); //cyan
-    std::vector<Stipple> magenta = m_stippling.stipple(m_image_m, params, QColor(255,0,255,180)); //magenta
-    std::vector<Stipple> yellow = m_stippling.stipple(m_image_y, params, QColor(255,255,0,180)); //yellow
-    std::vector<Stipple> black = m_stippling.stipple(m_image_k, params, QColor(0,0,0,180)); //black
+    std::vector<Stipple> cyan, magenta, yellow, black;
+
+    clock_t begin_time = clock();
+
+    cyan = m_stippling.stipple(m_image_c, params, QColor(0,255,255,180)); //cyan
+    magenta = m_stippling.stipple(m_image_m, params, QColor(255,0,255,180)); //magenta
+    yellow = m_stippling.stipple(m_image_y, params, QColor(255,255,0,180)); //yellow
+    black = m_stippling.stipple(m_image_k, params, QColor(0,0,0,180)); //black
+/*
+    #pragma omp parallel sections
+    {
+      #pragma omp section
+      cyan = m_stippling.stipple(m_image_c, params, QColor(0,255,255,180)); //cyan
+
+      #pragma omp section
+      magenta = m_stippling.stipple(m_image_m, params, QColor(255,0,255,180)); //magenta
+
+      #pragma omp section
+      yellow = m_stippling.stipple(m_image_y, params, QColor(255,255,0,180)); //yellow
+
+      #pragma omp section
+      black = m_stippling.stipple(m_image_k, params, QColor(0,0,0,180)); //black
+    }*/
+
+    clock_t end_time = clock();
+    double time = double(end_time - begin_time)/CLOCKS_PER_SEC*1000;
+
+    std::cout << "stippleviewer.cpp CMYK TIME: " << time << " ms" << std::endl;
+
     displayPoints(cyan, magenta, yellow, black);
 //    std::copy(black.begin(), black.end(), stipples.begin());
     if (params.solveTSP) {
       this->scene()->clear();
+      clock_t begin_time = clock();
+
+      #pragma omp parallel sections
+      {
+        #pragma omp section
+        m_TSP.solve(cyan);
+
+        #pragma omp section
+        m_TSP.solve(magenta);
+
+        #pragma omp section
+        m_TSP.solve(yellow);
+
+        #pragma omp section
+        m_TSP.solve(black);
+      }
+      
+      /*
       m_TSP.solve(cyan);
       displayTSP(cyan, m_TSP.solution);
       m_TSP.solve(magenta);
@@ -205,6 +248,11 @@ void StippleViewer::stipple(const LBGStippling::Params params) {
       displayTSP(yellow, m_TSP.solution);
       m_TSP.solve(black);
       displayTSP(black, m_TSP.solution);
+      */
+
+      clock_t end_time = clock();
+      double time = double(end_time - begin_time)/CLOCKS_PER_SEC*1000;
+      std::cout << "stippleviewer.cpp TSP TIME: " << time << " ms" << std::endl;
     }
   }
 
