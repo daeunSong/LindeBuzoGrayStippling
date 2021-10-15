@@ -51,6 +51,8 @@ The following libraries are required:
 * Qt5Widgets
 * Qt5Svg
 * Qt5PrintSupport
+* Concorde
+* QSopt
 
 Install Qt5 from source for newer version.
 ```sh
@@ -63,10 +65,15 @@ Add the Qt5 install path to the `PATH` variable. Replace the `$QT_INSTALL_PATH` 
 export PATH=${QT_INSTALL_PATH}/Qt5.12.11/5.12.11/gcc_64:$PATH
 ```
 
+Install Concorde by following this [link](https://github.com/daeunSong/how_to_build_concorde). Make a `lib` directory and copy and paste all the followings:
+
+`concode.a` `conconde.h` `qsopt.a` `qsopt.h`
+
+
 ### Building
 ```bash
 mkdir build
-cd build
+cd build && mkdir logs
 cmake ..
 make
 ./LBGStippling

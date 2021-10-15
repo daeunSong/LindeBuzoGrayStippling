@@ -17,6 +17,7 @@ set(HEADERS
   ${PROJECT_DIR}/src/lbgstippling.h
   ${PROJECT_DIR}/src/settingswidget.h
   ${PROJECT_DIR}/src/voronoicell.h
+  ${PROJECT_DIR}/src/optimizing.h
   ${PROJECT_DIR}/src/tsp.h
 )
 
@@ -29,6 +30,7 @@ set(SOURCES
   ${PROJECT_DIR}/src/lbgstippling.cpp
   ${PROJECT_DIR}/src/settingswidget.cpp
   ${PROJECT_DIR}/src/voronoicell.cpp
+  ${PROJECT_DIR}/src/optimizing.cpp
   ${PROJECT_DIR}/src/tsp.cpp
 )
 
@@ -41,6 +43,7 @@ include_directories(
   ${Qt5Widgets_INCLUDE_DIRS}
   ${Qt5Svg_INCLUDE_DIRS}
   ${Qt5PrintSupport_INCLUDE_DIRS}
+  ${CMAKE_PREFIX_PATH}/include
 )
 
 add_executable(${PROJECT_NAME} ${HEADERS} ${SOURCES} resources.qrc)
@@ -52,4 +55,6 @@ target_link_libraries(${PROJECT_NAME}
 	Qt5::PrintSupport
   ${CMAKE_SOURCE_DIR}/lib/concorde.a
   ${CMAKE_SOURCE_DIR}/lib/qsopt.a
+  ${CMAKE_PREFIX_PATH}/lib
 )
+
