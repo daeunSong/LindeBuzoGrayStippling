@@ -8,6 +8,7 @@
 
 #include "lbgstippling.h"
 #include "tsp.h"
+#include "optimizing.h"
 
 class StippleViewer : public QGraphicsView {
   Q_OBJECT
@@ -39,6 +40,7 @@ class StippleViewer : public QGraphicsView {
  private:
   LBGStippling m_stippling;
   TSP m_TSP;
+  Optimizing m_Optimizing;
   QImage m_image;
 };
 

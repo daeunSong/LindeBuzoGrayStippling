@@ -24,6 +24,7 @@ StippleViewer::StippleViewer(const QImage &img, QWidget *parent)
 
   m_stippling = LBGStippling();
   m_TSP = TSP();
+  m_Optimizing = Optimizing();
   m_stippling.setStatusCallback([this](const auto &status) {
     emit iterationStatus(status.iteration + 1, status.size, status.splits,
                          status.merges, status.hysteresis);
@@ -39,7 +40,7 @@ void StippleViewer::displayPoints(const std::vector<Stipple> &stipples) {
     double x = static_cast<double>(s.pos.x() * m_image.width() - s.size / 2.0f);
     double y =
         static_cast<double>(s.pos.y() * m_image.height() - s.size / 2.0f);
-    double size = static_cast<double>(s.size);
+    double size = static_cast<double>(2.0);//s.size);
     this->scene()->addEllipse(x, y, size, size, Qt::NoPen, s.color);
   }
   // TODO: Fix event handling
@@ -53,28 +54,28 @@ void StippleViewer::displayPoints(const std::vector<Stipple> &stipples_c, const 
     double x = static_cast<double>(s.pos.x() * m_image.width() - s.size / 2.0f);
     double y =
         static_cast<double>(s.pos.y() * m_image.height() - s.size / 2.0f);
-    double size = static_cast<double>(s.size);
+    double size = static_cast<double>(2.0);//s.size);
     this->scene()->addEllipse(x, y, size, size, Qt::NoPen, s.color);
   }
   for (const auto &s : stipples_m) {
     double x = static_cast<double>(s.pos.x() * m_image.width() - s.size / 2.0f);
     double y =
         static_cast<double>(s.pos.y() * m_image.height() - s.size / 2.0f);
-    double size = static_cast<double>(s.size);
+    double size = static_cast<double>(2.0);//s.size);
     this->scene()->addEllipse(x, y, size, size, Qt::NoPen, s.color);
   }
   for (const auto &s : stipples_y) {
     double x = static_cast<double>(s.pos.x() * m_image.width() - s.size / 2.0f);
     double y =
         static_cast<double>(s.pos.y() * m_image.height() - s.size / 2.0f);
-    double size = static_cast<double>(s.size);
+    double size = static_cast<double>(2.0);//s.size);
     this->scene()->addEllipse(x, y, size, size, Qt::NoPen, s.color);
   }
   for (const auto &s : stipples_k) {
     double x = static_cast<double>(s.pos.x() * m_image.width() - s.size / 2.0f);
     double y =
         static_cast<double>(s.pos.y() * m_image.height() - s.size / 2.0f);
-    double size = static_cast<double>(s.size);
+    double size = static_cast<double>(2.0);//s.size);
     this->scene()->addEllipse(x, y, size, size, Qt::NoPen, s.color);
   }
   // TODO: Fix event handling
@@ -108,7 +109,7 @@ void StippleViewer::displayTSP(const std::vector<Stipple> &c, const std::vector<
   displayTSP(c, cc);
   displayTSP(m, mm);
   displayTSP(y, yy);
-//  displayTSP(k, kk);
+  displayTSP(k, kk);
 }
 
 QPixmap StippleViewer::getImage() {
@@ -119,23 +120,6 @@ QPixmap StippleViewer::getImage() {
   painter.setRenderHint(QPainter::Antialiasing, true);
   this->scene()->render(&painter);
   return pixmap;
-}
-
-void StippleViewer::saveRoboticPath (const std::vector<Stipple> &stipples, const std::vector<int> &solution, const QString fname, const std::string extension) {
-  std::ofstream out("logs/"+std::string(fname.toUtf8().constData())+"_path_"+extension+".txt");
-  out << m_image.width() << " " << m_image.height() << std::endl; // save the drawing size
-  int count = 0;
-  for (auto i: solution) {
-    out << stipples[i].pos.x() << " " << stipples[i].pos.y() << std::endl;
-    count ++;
-    if (count > 4999) {
-      out << "End" << std::endl;
-      out << stipples[i].pos.x() << " " << stipples[i].pos.y() << std::endl;
-      count = 0;
-    }
-  }
-  out << "End" << std::endl;
-  out.close();
 }
 
 void StippleViewer::saveImagePNG(const QString &path) {
@@ -243,7 +227,7 @@ void StippleViewer::stipple(const LBGStippling::Params params) {
       log << "K \t" << stipple_k.size() << "\t" << time_stipple_k << " ms\t" << time_tsp_k << "ms\n";
       log.close();
 
-      saveRoboticPath (stipple_k, tsp_k, params.fileName, "k");
+      m_Optimizing.saveRoboticPath (stipple_k, tsp_k, params.fileName, "k", m_image.width(), m_image.height());
     }
   }
   else {
@@ -254,13 +238,13 @@ void StippleViewer::stipple(const LBGStippling::Params params) {
       m_image_k.save(qstr("logs/")+params.fileName+qstr("_k.png"));
     }
 
-    tie(stipple_c, time_stipple_c) = m_stippling.stipple(m_image_c, params, QColor(0,255,255,180)); //cyan
+    tie(stipple_c, time_stipple_c) = m_stippling.stipple(m_image_c, params, QColor(0,255,255,255)); //cyan
     if (params.saveLog) saveImagePNG(qstr("logs/")+params.fileName+qstr("_stipple_c.png"));
-    tie(stipple_m, time_stipple_m) = m_stippling.stipple(m_image_m, params, QColor(255,0,255,180)); //magenta
+    tie(stipple_m, time_stipple_m) = m_stippling.stipple(m_image_m, params, QColor(255,0,255,255)); //magenta
     if (params.saveLog) saveImagePNG(qstr("logs/")+params.fileName+qstr("_stipple_m.png"));
-    tie(stipple_y, time_stipple_y) = m_stippling.stipple(m_image_y, params, QColor(255,255,0,180)); //yellow
+    tie(stipple_y, time_stipple_y) = m_stippling.stipple(m_image_y, params, QColor(255,255,0,255)); //yellow
     if (params.saveLog) saveImagePNG(qstr("logs/")+params.fileName+qstr("_stipple_y.png"));
-    tie(stipple_k, time_stipple_k) = m_stippling.stipple(m_image_k, params, QColor(0,0,0,180)); //black
+    tie(stipple_k, time_stipple_k) = m_stippling.stipple(m_image_k, params, QColor(0,0,0,150)); //black
     if (params.saveLog) saveImagePNG(qstr("logs/")+params.fileName+qstr("_stipple_k.png"));
     displayPoints(stipple_c, stipple_m, stipple_y, stipple_k);
     if (params.saveLog) saveImagePNG(qstr("logs/")+params.fileName+qstr("_stipple.png"));
@@ -295,10 +279,10 @@ void StippleViewer::stipple(const LBGStippling::Params params) {
       log.close();
 
       // save the robotic path
-      saveRoboticPath (stipple_c, tsp_c, params.fileName, "c");
-      saveRoboticPath (stipple_m, tsp_m, params.fileName, "m");
-      saveRoboticPath (stipple_y, tsp_y, params.fileName, "y");
-      saveRoboticPath (stipple_k, tsp_k, params.fileName, "k");
+      m_Optimizing.saveRoboticPath (stipple_c, tsp_c, params.fileName, "c", m_image.width(), m_image.height());
+      m_Optimizing.saveRoboticPath (stipple_m, tsp_m, params.fileName, "m", m_image.width(), m_image.height());
+      m_Optimizing.saveRoboticPath (stipple_y, tsp_y, params.fileName, "y", m_image.width(), m_image.height());
+      m_Optimizing.saveRoboticPath (stipple_k, tsp_k, params.fileName, "k", m_image.width(), m_image.height());
 
     }
   }

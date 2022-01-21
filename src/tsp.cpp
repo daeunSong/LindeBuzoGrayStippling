@@ -16,7 +16,7 @@ TSP::TSP () {
 // Write .tsp file
 void TSP::writeDataFile (const std::vector<Stipple> &stipples) {
   FILE *out = fopen (m_TSPSolver.name, "w");
-  m_TSPSolver. ncount = stipples.size();
+  m_TSPSolver.ncount = stipples.size();
 
   fprintf (out, "NAME: concorde%d\n",m_TSPSolver. ncount);
   fprintf (out, "TYPE: TSP\n");
