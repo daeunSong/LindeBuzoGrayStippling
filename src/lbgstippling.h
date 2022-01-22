@@ -17,7 +17,8 @@ struct Stipple {
 class LBGStippling {
  public:
   struct Params {
-    bool colorSplit = false;
+    bool colorSplit = true;
+    size_t colorNum = 3;
 
     size_t initialPoints = 1;
     float initialPointSize = 2.0f;
@@ -39,6 +40,7 @@ class LBGStippling {
     std::vector<int> threshold = {30, 50, 5, 70}; // c, m, y, k threshold value
 
     QString fileName = "input1";
+    QString path = fileName;
   };
 
   struct Status {

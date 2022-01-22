@@ -7,6 +7,8 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 
+find_package(OpenCV REQUIRED)
+
 set(PROJECT_DIR ${PROJECT_SOURCE_DIR})
 
 # add headers to project
@@ -44,6 +46,7 @@ include_directories(
   ${Qt5Svg_INCLUDE_DIRS}
   ${Qt5PrintSupport_INCLUDE_DIRS}
   ${CMAKE_PREFIX_PATH}/include
+  ${OpenCV_INCLUDE_DIR}
 )
 
 add_executable(${PROJECT_NAME} ${HEADERS} ${SOURCES} resources.qrc)
@@ -56,5 +59,6 @@ target_link_libraries(${PROJECT_NAME}
   ${CMAKE_SOURCE_DIR}/lib/concorde.a
   ${CMAKE_SOURCE_DIR}/lib/qsopt.a
   ${CMAKE_PREFIX_PATH}/lib
+  ${OpenCV_LIBRARIES}
 )
 
