@@ -303,6 +303,7 @@ void StippleViewer::stipple(const LBGStippling::Params params) {
     if (params.saveLog) saveImagePNG(qstr("logs/")+params.fileName+qstr("_stipple_")+qstr(std::to_string(i))+".png");
   }
   displayPoints(stipples);
+  if (params.saveLog) saveImagePNG(qstr("logs/")+params.fileName+qstr("_stipple.png"));
   this->scene()->clear();
 
   if (params.solveTSP) {
@@ -313,9 +314,9 @@ void StippleViewer::stipple(const LBGStippling::Params params) {
       if (params.interactiveDisplay) displayTSP(stipples[i], tsp);
       if (params.saveLog) saveImagePNG(qstr("logs/")+params.fileName+qstr("_tsp_")+qstr(std::to_string(i))+".png");
     }
+    displayTSP(stipples, tsps);
+    if (params.saveLog) saveImagePNG(qstr("logs/")+params.fileName+qstr("_tsp.png"));
   }
-  displayTSP(stipples, tsps);
-  if (params.saveLog) saveImagePNG(qstr("logs/")+params.fileName+qstr("_tsp.png"));
 
   // LOGGING
   if (params.saveLog) {
@@ -334,196 +335,6 @@ void StippleViewer::stipple(const LBGStippling::Params params) {
     // save the robotic path
     for (int i = 0; i < params.colorNum; i++)
       m_Optimizing.saveRoboticPath (stipples[i], tsps[i], params.fileName, std::to_string(i), m_image.width(), m_image.height());
-
   }
-/*
-
-  if (params.colorSplit) {
-    tie(stipple_1, time_stipple_1) = m_stippling.stipple(m_image_1, params, qRgb(params.color1_r, params.color1_g, params.color1_b)); //cyan
-    if (params.saveLog) saveImagePNG(qstr("logs/")+params.fileName+qstr("_stipple_1.png"));
-    tie(stipple_2, time_stipple_2) = m_stippling.stipple(m_image_2, params, qRgb(params.color2_r, params.color2_g, params.color2_b)); //magenta
-    if (params.saveLog) saveImagePNG(qstr("logs/")+params.fileName+qstr("_stipple_2.png"));
-    tie(stipple_3, time_stipple_3) = m_stippling.stipple(m_image_3, params, qRgb(params.color3_r, params.color3_g, params.color3_b)); //yellow
-    if (params.saveLog) saveImagePNG(qstr("logs/")+params.fileName+qstr("_stipple_3.png"));
-//    tie(stipple_k, time_stipple_k) = m_stippling.stipple(m_image_k, params, QColor(0,0,0,150)); //black
-//    if (params.saveLog) saveImagePNG(qstr("logs/")+params.fileName+qstr("_stipple_k.png"));
-    displayPoints(stipple_1, stipple_2, stipple_3, stipple_1);
-    if (params.saveLog) saveImagePNG(qstr("logs/")+params.fileName+qstr("_stipple.png"));
-
-    if (params.solveTSP) {
-      this->scene()->clear();
-      tie(tsp_1, time_tsp_1) = m_TSP.solve(stipple_1);
-      if (params.interactiveDisplay) displayTSP(stipple_1, tsp_1);
-      if (params.saveLog) saveImagePNG(qstr("logs/")+params.fileName+qstr("_tsp_1.png"));
-      tie(tsp_2, time_tsp_2) = m_TSP.solve(stipple_2);
-      if (params.interactiveDisplay) this->scene()->clear(); displayTSP(stipple_2, tsp_2);
-      if (params.saveLog) saveImagePNG(qstr("logs/")+params.fileName+qstr("_tsp_2.png"));
-      tie(tsp_3, time_tsp_3) = m_TSP.solve(stipple_3);
-      if (params.interactiveDisplay) this->scene()->clear(); displayTSP(stipple_3, tsp_3);
-      if (params.saveLog) saveImagePNG(qstr("logs/")+params.fileName+qstr("_tsp_3.png"));
-//      tie(tsp_k, time_tsp_k) = m_TSP.solve(stipple_k);
-//      if (params.interactiveDisplay) this->scene()->clear(); displayTSP(stipple_k, tsp_k);
-//      if (params.saveLog) saveImagePNG(qstr("logs/")+params.fileName+qstr("_tsp_k.png"));
-      displayTSP(stipple_1, tsp_1, stipple_2, tsp_2, stipple_3, tsp_3, stipple_1, tsp_1);
-      if (params.saveLog) saveImagePNG(qstr("logs/")+params.fileName+qstr("_tsp.png"));
-    }
-
-    // LOGGING
-    if (params.saveLog) {
-      std::ofstream log("logs/"+std::string(params.fileName.toUtf8().constData())+"_log.txt");
-      log << params.fileName.toUtf8().constData() << std::endl;
-      log << "COLOR :\n";
-      log << "Color1: " << params.color1_r << "\t" << params.color1_g << "\t" << params.color1_b << "\n";
-      log << "Color2: " << params.color2_r << "\t" << params.color2_g << "\t" << params.color2_b << "\n";
-      log << "Color3: " << params.color3_r << "\t" << params.color3_g << "\t" << params.color3_b << "\n\n";
-
-      log << "SIZE & TIME :\n";
-      log << "Color1 \t" << stipple_1.size() << "\t" << time_stipple_1  << " ms\t" << time_tsp_1 << "ms\n";
-      log << "Color2 \t" << stipple_2.size() << "\t" << time_stipple_2 << " ms\t" << time_tsp_2 << "ms\n";
-      log << "Color3 \t" << stipple_3.size() << "\t" << time_stipple_3 << " ms\t" << time_tsp_3 << "ms\n";
-//      log << "K \t" << stipple_k.size() << "\t" << time_stipple_k << " ms\t" << time_tsp_k << "ms\n";
-      log.close();
-
-      // save the robotic path
-      m_Optimizing.saveRoboticPath (stipple_1, tsp_1, params.fileName, "1", m_image.width(), m_image.height());
-      m_Optimizing.saveRoboticPath (stipple_2, tsp_2, params.fileName, "2", m_image.width(), m_image.height());
-      m_Optimizing.saveRoboticPath (stipple_3, tsp_3, params.fileName, "3", m_image.width(), m_image.height());
-//      m_Optimizing.saveRoboticPath (stipple_k, tsp_k, params.fileName, "k", m_image.width(), m_image.height());
-
-    }
-  }
-
-
-  // Split images in CMYK
-//  m_image.convertToFormat(QImage::Format_RGBA8888);
-  QImage m_image_1 = m_image.copy();
-  QImage m_image_2 = m_image.copy();
-  QImage m_image_3 = m_image.copy();
-
-  for(int j = 0; j < m_image.height(); j++) {
-    for(int i = 0; i < m_image.width(); i++) {
-      int r, g, b;
-      QColor pixel_color = m_image.pixel(i, j);
-      pixel_color.getRgb(&r, &g, &b);
-
-      if (abs(int(r - params.color1_r)) < 10 && abs(int(g - params.color1_g)) < 10 && abs(int(b - params.color1_b) < 10)) {
-        m_image_1.setPixel(i, j, qRgb(r,g,b));
-        m_image_2.setPixel(i, j, qRgb(255, 255, 255));
-        m_image_3.setPixel(i, j, qRgb(255, 255, 255));
-      }
-      else if (abs(int(r - params.color2_r)) < 10 && abs(int(g - params.color2_g)) < 10 && abs(int(b - params.color2_b)) < 10) {
-        m_image_1.setPixel(i, j, qRgb(255, 255, 255));
-        m_image_2.setPixel(i, j, qRgb(r,g,b));
-        m_image_3.setPixel(i, j, qRgb(255, 255, 255));
-      }
-      else if (abs(int(r - params.color3_r)) < 10 && abs(int(g - params.color3_g)) < 10 && abs(int(b - params.color3_b)) < 10) {
-        m_image_1.setPixel(i, j, qRgb(255, 255, 255));
-        m_image_2.setPixel(i, j, qRgb(255, 255, 255));
-        m_image_3.setPixel(i, j, qRgb(r,g,b));
-      }
-      else {
-        m_image_1.setPixel(i, j, qRgb(255, 255, 255));
-        m_image_2.setPixel(i, j, qRgb(255, 255, 255));
-        m_image_3.setPixel(i, j, qRgb(255, 255, 255));
-      }
-    }
-  }
-
-  std::vector<Stipple> stipple_1, stipple_2, stipple_3;
-  double time_stipple_1 = 0, time_stipple_2 = 0, time_stipple_3 = 0;
-  std::vector<int> tsp_1, tsp_2, tsp_3;
-  double time_tsp_1 = 0, time_tsp_2= 0 , time_tsp_3 = 0;
-
-  // TODO: Handle return value
-  if (!params.colorSplit) {
-//    if (params.saveLog) m_image_k.save(qstr("logs/")+params.fileName+qstr("_k.png"));
-//
-//    tie(stipple_k, time_stipple_k) =  m_stippling.stipple(m_image_k, params, Qt::black); //black
-//    if (!params.interactiveDisplay) {
-//      displayPoints(stipple_k);
-//    }
-//    if (params.saveLog) saveImagePNG(qstr("logs/")+params.fileName+qstr("_stipple.png"));
-//
-//    if (params.solveTSP) {
-//      this->scene()->clear();
-//      tie(tsp_k, time_tsp_k) = m_TSP.solve(stipple_k);
-//      displayTSP(stipple_k, tsp_k);
-//      if (params.saveLog) saveImagePNG(qstr("logs/")+params.fileName+qstr("_tsp.png"));
-//    }
-//
-//    // LOGGING
-//    if (params.saveLog) {
-//      std::ofstream log("logs/"+std::string(params.fileName.toUtf8().constData())+"_log.txt");
-//      log << params.fileName.toUtf8().constData() << std::endl;
-//      log << "COLOR : BLACK\n";
-//      log << "K \t" << stipple_k.size() << "\t" << time_stipple_k << " ms\t" << time_tsp_k << "ms\n";
-//      log.close();
-//
-//      m_Optimizing.saveRoboticPath (stipple_k, tsp_k, params.fileName, "k", m_image.width(), m_image.height());
-//    }
-  }
-  else {
-    if (params.saveLog){
-      m_image_1.save(qstr("logs/")+params.fileName+qstr("_1.png"));
-      m_image_2.save(qstr("logs/")+params.fileName+qstr("_2.png"));
-      m_image_3.save(qstr("logs/")+params.fileName+qstr("_3.png"));
-    }
-
-    tie(stipple_1, time_stipple_1) = m_stippling.stipple(m_image_1, params, qRgb(params.color1_r, params.color1_g, params.color1_b)); //cyan
-    if (params.saveLog) saveImagePNG(qstr("logs/")+params.fileName+qstr("_stipple_1.png"));
-    tie(stipple_2, time_stipple_2) = m_stippling.stipple(m_image_2, params, qRgb(params.color2_r, params.color2_g, params.color2_b)); //magenta
-    if (params.saveLog) saveImagePNG(qstr("logs/")+params.fileName+qstr("_stipple_2.png"));
-    tie(stipple_3, time_stipple_3) = m_stippling.stipple(m_image_3, params, qRgb(params.color3_r, params.color3_g, params.color3_b)); //yellow
-    if (params.saveLog) saveImagePNG(qstr("logs/")+params.fileName+qstr("_stipple_3.png"));
-//    tie(stipple_k, time_stipple_k) = m_stippling.stipple(m_image_k, params, QColor(0,0,0,150)); //black
-//    if (params.saveLog) saveImagePNG(qstr("logs/")+params.fileName+qstr("_stipple_k.png"));
-    displayPoints(stipple_1, stipple_2, stipple_3, stipple_1);
-    if (params.saveLog) saveImagePNG(qstr("logs/")+params.fileName+qstr("_stipple.png"));
-
-    if (params.solveTSP) {
-      this->scene()->clear();
-      tie(tsp_1, time_tsp_1) = m_TSP.solve(stipple_1);
-      if (params.interactiveDisplay) displayTSP(stipple_1, tsp_1);
-      if (params.saveLog) saveImagePNG(qstr("logs/")+params.fileName+qstr("_tsp_1.png"));
-      tie(tsp_2, time_tsp_2) = m_TSP.solve(stipple_2);
-      if (params.interactiveDisplay) this->scene()->clear(); displayTSP(stipple_2, tsp_2);
-      if (params.saveLog) saveImagePNG(qstr("logs/")+params.fileName+qstr("_tsp_2.png"));
-      tie(tsp_3, time_tsp_3) = m_TSP.solve(stipple_3);
-      if (params.interactiveDisplay) this->scene()->clear(); displayTSP(stipple_3, tsp_3);
-      if (params.saveLog) saveImagePNG(qstr("logs/")+params.fileName+qstr("_tsp_3.png"));
-//      tie(tsp_k, time_tsp_k) = m_TSP.solve(stipple_k);
-//      if (params.interactiveDisplay) this->scene()->clear(); displayTSP(stipple_k, tsp_k);
-//      if (params.saveLog) saveImagePNG(qstr("logs/")+params.fileName+qstr("_tsp_k.png"));
-      displayTSP(stipple_1, tsp_1, stipple_2, tsp_2, stipple_3, tsp_3, stipple_1, tsp_1);
-      if (params.saveLog) saveImagePNG(qstr("logs/")+params.fileName+qstr("_tsp.png"));
-    }
-
-    // LOGGING
-    if (params.saveLog) {
-      std::ofstream log("logs/"+std::string(params.fileName.toUtf8().constData())+"_log.txt");
-      log << params.fileName.toUtf8().constData() << std::endl;
-      log << "COLOR :\n";
-      log << "Color1: " << params.color1_r << "\t" << params.color1_g << "\t" << params.color1_b << "\n";
-      log << "Color2: " << params.color2_r << "\t" << params.color2_g << "\t" << params.color2_b << "\n";
-      log << "Color3: " << params.color3_r << "\t" << params.color3_g << "\t" << params.color3_b << "\n\n";
-
-      log << "SIZE & TIME :\n";
-      log << "Color1 \t" << stipple_1.size() << "\t" << time_stipple_1  << " ms\t" << time_tsp_1 << "ms\n";
-      log << "Color2 \t" << stipple_2.size() << "\t" << time_stipple_2 << " ms\t" << time_tsp_2 << "ms\n";
-      log << "Color3 \t" << stipple_3.size() << "\t" << time_stipple_3 << " ms\t" << time_tsp_3 << "ms\n";
-//      log << "K \t" << stipple_k.size() << "\t" << time_stipple_k << " ms\t" << time_tsp_k << "ms\n";
-      log.close();
-
-      // save the robotic path
-      m_Optimizing.saveRoboticPath (stipple_1, tsp_1, params.fileName, "1", m_image.width(), m_image.height());
-      m_Optimizing.saveRoboticPath (stipple_2, tsp_2, params.fileName, "2", m_image.width(), m_image.height());
-      m_Optimizing.saveRoboticPath (stipple_3, tsp_3, params.fileName, "3", m_image.width(), m_image.height());
-//      m_Optimizing.saveRoboticPath (stipple_k, tsp_k, params.fileName, "k", m_image.width(), m_image.height());
-
-    }
-  }
-*/
   emit finished();
-//  m_TSPSolver.solve(stipples);
-
 }
