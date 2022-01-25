@@ -227,28 +227,30 @@ std::tuple<std::vector<cv::Mat>, std::vector<std::vector<int>>> StippleViewer::k
 //  m_image.convertToFormat(QImage::Format_RGB888);
 //  cv::Mat img = QImage2Mat(m_image);
 //  cv::cvtColor(img, img, CV_BGR2RGB);
-  cv::Mat img = cv::imread(params.path.toStdString());
+  cv::Mat img = cv::imread(params.path.toStdString()); // BGR
+  cv::Mat img_hsv;
+  cv::cvtColor(img, img_hsv, cv::COLOR_BGR2HSV); // HSV
   std::vector<cv::Mat> imgs;
 
   cv::Mat bestLabels, centers;
-  cv::Mat clustered(img.size(), img.type());
+  cv::Mat clustered(img_hsv.size(), img.type());
 
   for (int i = 0; i < K ; i ++){
-    cv::Mat splitted(img.size(), img.type());
+    cv::Mat splitted(img_hsv.size(), img_hsv.type());
     splitted = cv::Scalar(255,255,255);
     imgs.push_back(splitted);
   }
 
-  // samples
-	cv::Mat samples(img.rows * img.cols, img.channels(), CV_32F);
-	for (int y = 0; y < img.rows; y++)
-		for (int x = 0; x < img.cols; x++)
-			for (int z = 0; z < img.channels(); z++)
-				if (img.channels() == 3) {
-					samples.at<float>(y + x * img.rows, z) = img.at<cv::Vec3b>(y, x)[z];
+  // samples and center in [0,1]
+	cv::Mat samples(img_hsv.rows * img_hsv.cols, img_hsv.channels(), CV_32F);
+	for (int y = 0; y < img_hsv.rows; y++)
+		for (int x = 0; x < img_hsv.cols; x++)
+			for (int z = 0; z < img_hsv.channels(); z++)
+				if (img_hsv.channels() == 3) {
+					samples.at<float>(y + x * img_hsv.rows, z) = img_hsv.at<cv::Vec3b>(y, x)[z];
 				}
 				else {
-					samples.at<float>(y + x * img.rows, z) = img.at<uchar>(y, x);
+					samples.at<float>(y + x * img_hsv.rows, z) = img_hsv.at<uchar>(y, x);
 				}
   // kmeans clustering
   cv::kmeans(samples, K, bestLabels,
@@ -258,8 +260,18 @@ std::tuple<std::vector<cv::Mat>, std::vector<std::vector<int>>> StippleViewer::k
   std::vector<std::vector<int>> colors; // r, g, b colors
   for (int i = 0; i < K ; i ++){
     std::vector<int> color;
-    for (int j = 2; j >= 0 ;j--)
-      color.push_back(centers.at<float>(i,j));
+    cv::Mat hsv = cv::Mat(1, 1, CV_8UC3, cv::Scalar(int(centers.at<float>(i,0)),int(centers.at<float>(i,1)),int(centers.at<float>(i,2))));
+    cv::Mat bgr;
+    cv::cvtColor(hsv, bgr, cv::COLOR_HSV2BGR);
+    std::cout << hsv << ", " << hsv.type() << std::endl;
+    std::cout << bgr << ", " << bgr.type() << std::endl;
+    bgr.convertTo(bgr, CV_32F);
+//    cv::cvtColor(centers, bgr, cv::COLOR_HSV2BGR);  // HSV2BGR
+    for (int j = 2; j >= 0 ; j--){  // b, g, r -> r, g, b
+//      color.push_back(centers.at<float>(i,j));
+      color.push_back(bgr.at<float>(0,j));
+      std::cout << bgr.at<float>(0,j) << std::endl;
+    }
     colors.push_back(color);
   }
 
@@ -267,10 +279,15 @@ std::tuple<std::vector<cv::Mat>, std::vector<std::vector<int>>> StippleViewer::k
     for (int x = 0; x < clustered.cols; x++)  {
       int index = y + x * clustered.rows;
       int cluster_index = bestLabels.at<int>(index, 0);
+
+      cv::Mat hsv = cv::Mat(1, 1, CV_8UC3, cv::Scalar(int(centers.at<float>(cluster_index,0)),int(centers.at<float>(cluster_index,1)),int(centers.at<float>(cluster_index,2))));
+      cv::Mat bgr;
+      cv::cvtColor(hsv, bgr, cv::COLOR_HSV2BGR);
+      bgr.convertTo(bgr, CV_32F);
       // set new color
       for (int i = 0; i < 3; i++) {
-        clustered.at<cv::Vec3b>(y, x)[i] = centers.at<float>(cluster_index, i);
-        imgs[cluster_index].at<cv::Vec3b>(y, x)[i] = centers.at<float>(cluster_index, i);
+        clustered.at<cv::Vec3b>(y, x)[i] = bgr.at<float>(0,i); // centers.at<float>(cluster_index, i);
+        imgs[cluster_index].at<cv::Vec3b>(y, x)[i] = bgr.at<float>(0,i);//centers.at<float>(cluster_index, i);
       }
     }
   }
