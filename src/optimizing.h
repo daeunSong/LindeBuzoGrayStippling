@@ -6,6 +6,7 @@
 #include <tuple>
 #include <iostream>
 #include <fstream>
+#include <math.h>
 
 class Optimizing {
  public:
@@ -22,7 +23,7 @@ class Optimizing {
   Optimizing();
 
   void saveRoboticPath (const std::vector<Stipple> &stipples, const std::vector<int> &solution, const QString fname, const std::string extension, const int width, const int height);
-
+  double calDist(double x1, double y1, double x2, double y2);
 };
 
 #endif  // OPTIMIZING_H

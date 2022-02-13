@@ -38,6 +38,7 @@ class StippleViewer : public QGraphicsView {
               const std::vector<Stipple> &m, const std::vector<int> &mm,
               const std::vector<Stipple> &y, const std::vector<int> &yy,
               const std::vector<Stipple> &k, const std::vector<int> &kk);
+  double calDist(double x1, double y1, double x2, double y2);
 
   cv::Mat QImage2Mat(QImage const &img, int format);
   QImage Mat2QImage(cv::Mat const &mat, QImage::Format format);

@@ -261,10 +261,10 @@ std::tuple<std::vector<cv::Mat>, std::vector<std::vector<int>>> StippleViewer::k
 		for (int x = 0; x < img_hsv.cols; x++)
 			for (int z = 0; z < img_hsv.channels(); z++)
 				if (img_hsv.channels() == 3) {
-					samples.at<float>(y + x * img_hsv.rows, z) = img_hsv.at<cv::Vec3b>(y, x)[z];
+					samples.at<float>(y + x * img_hsv.rows, z) = img.at<cv::Vec3b>(y, x)[z];
 				}
 				else {
-					samples.at<float>(y + x * img_hsv.rows, z) = img_hsv.at<uchar>(y, x);
+					samples.at<float>(y + x * img_hsv.rows, z) = img.at<uchar>(y, x);
 				}
   // kmeans clustering
   cv::kmeans(samples, K, bestLabels,
@@ -274,9 +274,9 @@ std::tuple<std::vector<cv::Mat>, std::vector<std::vector<int>>> StippleViewer::k
   std::vector<std::vector<int>> colors; // r, g, b colors
   for (int i = 0; i < K ; i ++){
     std::vector<int> color;
-    cv::Mat hsv = cv::Mat(1, 1, CV_8UC3, cv::Scalar(int(centers.at<float>(i,0)),int(centers.at<float>(i,1)),int(centers.at<float>(i,2))));
-    cv::Mat bgr;
-    cv::cvtColor(hsv, bgr, cv::COLOR_HSV2BGR);
+    cv::Mat bgr = cv::Mat(1, 1, CV_8UC3, cv::Scalar(int(centers.at<float>(i,0)),int(centers.at<float>(i,1)),int(centers.at<float>(i,2))));
+    //cv::Mat bgr;
+    //cv::cvtColor(hsv, bgr, cv::COLOR_HSV2BGR);
     //std::cout << hsv << ", " << hsv.type() << std::endl;
     //std::cout << bgr << ", " << bgr.type() << std::endl;
     bgr.convertTo(bgr, CV_32F);
@@ -294,9 +294,9 @@ std::tuple<std::vector<cv::Mat>, std::vector<std::vector<int>>> StippleViewer::k
       int index = y + x * clustered.rows;
       int cluster_index = bestLabels.at<int>(index, 0);
 
-      cv::Mat hsv = cv::Mat(1, 1, CV_8UC3, cv::Scalar(int(centers.at<float>(cluster_index,0)),int(centers.at<float>(cluster_index,1)),int(centers.at<float>(cluster_index,2))));
-      cv::Mat bgr;
-      cv::cvtColor(hsv, bgr, cv::COLOR_HSV2BGR);
+      cv::Mat bgr = cv::Mat(1, 1, CV_8UC3, cv::Scalar(int(centers.at<float>(cluster_index,0)),int(centers.at<float>(cluster_index,1)),int(centers.at<float>(cluster_index,2))));
+      //cv::Mat bgr;
+      //cv::cvtColor(hsv, bgr, cv::COLOR_HSV2BGR);
       bgr.convertTo(bgr, CV_32F);
       // set new color
       for (int i = 0; i < 3; i++) {
